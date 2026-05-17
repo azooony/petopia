@@ -1,0 +1,27 @@
+# --- Backend (petopiafinall-master) ---
+petopiafinall-master/node_modules/
+petopiafinall-master/dist/
+petopiafinall-master/.env
+petopiafinall-master/uploads/
+petopiafinall-master/*.log
+petopiafinall-master/tsconfig.tsbuildinfo
+
+# --- Frontend (flutter_application_1) ---
+flutter_application_1/.dart_tool/
+flutter_application_1/build/
+flutter_application_1/.flutter-plugins
+flutter_application_1/.flutter-plugins-dependencies
+flutter_application_1/*.desktop
+flutter_application_1/*.exe
+
+# --- AI model weights (too large for GitHub) ---
+petopiafinall-master/ai-service/models/model.safetensors
+
+# --- General / IDEs ---
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp

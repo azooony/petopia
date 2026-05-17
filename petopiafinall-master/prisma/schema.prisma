@@ -1,0 +1,526 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+
+  output = "./ERD.svg"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                       String                    @id @default(cuid())
+  email                    String                    @unique
+  passwordHash             String
+  fullName                 String
+  age                      Int
+  role                     UserRole
+  createdAt                DateTime                  @default(now())
+  gender                   Gender
+  adminActions             AdminActionLog[]
+  appointmentsAsOwner      Appointment[]             @relation("OwnerAppointments")
+  appointmentsAsVet        Appointment[]             @relation("VetAppointments")
+  uploadedAssets           Asset[]                   @relation("AssetsUploadedBy")
+  sentMessages             ChatMessage[]             @relation("SentMessages")
+  conversationParticipants ConversationParticipant[]
+  medicalRecords           MedicalRecord[]
+  payments                 Payment[]                 @relation("PaymentsByUser")
+  pets                     Pet?
+  ownerProfile             PetOwnerProfile?
+  recognitionLogs          PetRecognitionLog[]
+ 
+  
+  availabilitySlots        VetAvailabilitySlot[]
+  vetProfile               VetProfile?
+  sitterProfile            SitterProfile?
+
+  sittingBookingsAsSitter  SittingBooking[]          @relation("BookingsBySitter")
+  sittingBookingsAsOwner   SittingBooking[]          @relation("BookingsByOwner")
+  sitterReviews            SitterReview[]
+}
+
+model PetOwnerProfile {
+  id           String        @id @default(cuid())
+  userId       String        @unique
+  phone        String
+  address      String?
+  appointments Appointment[]
+  payments     Payment[]
+  pets         Pet[]
+  user         User          @relation(fields: [userId], references: [id])
+}
+
+model VetProfile {
+  id                 String             @id @default(cuid())
+  userId             String             @unique
+  phone              String
+  description        String?
+  yearsOfExperience  Int
+  appointmentPrice   Float              @default(0)
+  startTime          String             @default("09:00")
+  endTime            String             @default("17:00")
+  certificateImage   String
+  clinicId           String
+  photo              String?
+  firstName          String?
+  surname            String?
+  specialization     String?
+  verificationStatus VerificationStatus @default(PENDING)
+  clinic             Clinic             @relation(fields: [clinicId], references: [id])
+  user               User               @relation(fields: [userId], references: [id])
+}
+
+model Clinic {
+  id                String                @id @default(cuid())
+  name              String
+  address           String
+  phone             String
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  availabilitySlots VetAvailabilitySlot[]
+  vets              VetProfile[]
+}
+
+model Pet {
+  id                String  @id @default(cuid())
+  ownerId           String  @unique
+  petOwnerProfileId String?
+
+  name        String
+  age         Int
+  breed       String?
+  gender      Gender?
+  description String?
+  photo       String?
+
+  petType               PetType @default(DOG)
+
+  isAvailableForSitting Boolean @default(false)
+  payRatePerDay         Float?
+  sittingNotes          String?
+
+  appointments      Appointment[]
+  medicalRecords    MedicalRecord[]
+  owner             User                @relation(fields: [ownerId], references: [id])
+  petOwnerProfile   PetOwnerProfile?    @relation(fields: [petOwnerProfileId], references: [id])
+  images            PetImage[]
+  matchProfile      PetMatchProfile?
+  matchRequestsFrom PetMatchRequest[]   @relation("MatchFromPet")
+  matchRequestsTo   PetMatchRequest[]   @relation("MatchToPet")
+  recognitionLogs   PetRecognitionLog[]
+  sittingBookings   SittingBooking[]
+  
+  
+}
+
+model PetImage {
+  id        String   @id @default(cuid())
+  petId     String
+  assetId   String
+  isPrimary Boolean  @default(false)
+  createdAt DateTime @default(now())
+  asset     Asset    @relation(fields: [assetId], references: [id])
+  pet       Pet      @relation(fields: [petId], references: [id])
+
+  @@unique([petId, assetId])
+  @@index([petId])
+}
+
+model PetRecognitionLog {
+  id                String   @id @default(cuid())
+  userId            String
+  petId             String?
+  inputAssetId      String
+  detectedBreed     String?
+  detectedAgeMonths Int?
+  createdAt         DateTime @default(now())
+  inputAsset        Asset    @relation("RecognitionInput", fields: [inputAssetId], references: [id])
+  pet               Pet?     @relation(fields: [petId], references: [id])
+  user              User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+}
+
+model MedicalRecord {
+  id            String       @id @default(cuid())
+  petId         String
+  vetId         String
+  appointmentId String?
+  visitDate     DateTime     @default(now())
+  diagnosis     String?
+  treatment     String?
+  notes         String?
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  pet           Pet          @relation(fields: [petId], references: [id])
+  vet           User         @relation(fields: [vetId], references: [id])
+
+  @@index([petId, visitDate])
+}
+
+model VetAvailabilitySlot {
+  id        String   @id @default(cuid())
+  vetId     String
+  clinicId  String?
+  startTime DateTime
+  endTime   DateTime
+  isActive  Boolean  @default(true)
+  clinic    Clinic?  @relation(fields: [clinicId], references: [id])
+  vet       User     @relation(fields: [vetId], references: [id], onDelete: Cascade)
+
+  @@index([vetId, startTime])
+}
+
+model Appointment {
+  id                String            @id @default(cuid())
+  ownerId           String
+  vetId             String
+  petId             String
+  clinicName        String?
+  clinicAddress     String?
+  startTime         DateTime
+  status            AppointmentStatus @default(PENDING)
+  reason            String?
+  price             Float
+  createdAt         DateTime          @default(now())
+  petOwnerProfileId String?
+  owner             User              @relation("OwnerAppointments", fields: [ownerId], references: [id])
+  pet               Pet               @relation(fields: [petId], references: [id])
+  petOwnerProfile   PetOwnerProfile?  @relation(fields: [petOwnerProfileId], references: [id])
+  vet               User              @relation("VetAppointments", fields: [vetId], references: [id])
+  medicalRecords    MedicalRecord[]
+  payment           Payment?          @relation("AppointmentPayment")
+
+  @@index([vetId, startTime])
+  @@index([ownerId, startTime])
+}
+
+model Payment {
+  id                String           @id @default(cuid())
+  appointmentId     String?          @unique
+  
+  payerId           String
+  method            PaymentMethod    @default(INSTAPAY)
+  status            PaymentStatus    @default(PENDING)
+  amount            Int
+  currency          String           @default("EGP")
+  proofAssetId      String?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  petOwnerProfileId String?
+  appointment       Appointment?     @relation("AppointmentPayment", fields: [appointmentId], references: [id], onDelete: Cascade)
+  payer             User             @relation("PaymentsByUser", fields: [payerId], references: [id])
+  petOwnerProfile   PetOwnerProfile? @relation(fields: [petOwnerProfileId], references: [id])
+  proofAsset        Asset?           @relation(fields: [proofAssetId], references: [id])
+  
+  @@index([payerId, createdAt])
+  @@index([status, createdAt])
+}
+
+model Conversation {
+  id           String                    @id @default(cuid())
+  type         ConversationType          @default(MATCHING)
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+  messages     ChatMessage[]
+  participants ConversationParticipant[]
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  userId         String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model ChatMessage {
+  id             String       @id @default(cuid())
+  conversationId String
+  senderId       String
+  assetId        String?
+  createdAt      DateTime     @default(now())
+  readAt         DateTime?
+  content        String?
+  asset          Asset?       @relation("MessageAsset", fields: [assetId], references: [id])
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@index([senderId, createdAt])
+}
+
+model PetMatchProfile {
+  id             String  @id @default(cuid())
+  petId          String  @unique
+  description    String?
+  address        String?
+  preferredBreed String?
+  isavailable    Boolean @default(true)
+  pet            Pet     @relation(fields: [petId], references: [id], onDelete: Cascade)
+}
+
+model PetMatchRequest {
+  id        String             @id @default(cuid())
+  fromPetId String
+  toPetId   String
+  status    MatchRequestStatus @default(PENDING)
+  createdAt DateTime           @default(now())
+  fromPet   Pet                @relation("MatchFromPet", fields: [fromPetId], references: [id], onDelete: Cascade)
+  toPet     Pet                @relation("MatchToPet", fields: [toPetId], references: [id], onDelete: Cascade)
+
+  @@unique([fromPetId, toPetId])
+  @@index([toPetId, status])
+}
+
+model SharedResources {
+  id          String        @id @default(cuid())
+  title       String
+  description String?
+  url         String
+  isFree      Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  tags        ResourceTag[]
+}
+
+model Tag {
+  id        String        @id @default(cuid())
+  name      String        @unique
+  resources ResourceTag[]
+}
+
+model ResourceTag {
+  id         String          @id @default(cuid())
+  resourceId String
+  tagId      String
+  resource   SharedResources @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  tag        Tag             @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([resourceId, tagId])
+}
+
+model Asset {
+  id                String              @id @default(cuid())
+  url               String
+  mimeType          String?
+  sizeBytes         Int?
+  storageKey        String?             @unique
+  uploadedById      String?
+  createdAt         DateTime            @default(now())
+  uploadedBy        User?               @relation("AssetsUploadedBy", fields: [uploadedById], references: [id])
+  messageAssets     ChatMessage[]       @relation("MessageAsset")
+  paymentProofs     Payment[]
+  petImages         PetImage[]
+  recognitionInputs PetRecognitionLog[] @relation("RecognitionInput")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Pet Sitting Module
+// ─────────────────────────────────────────────────────────────────────────────
+
+model SitterProfile {
+  id                 String                   @id @default(cuid())
+  userId             String                   @unique
+  bio                String?
+  IdCardImage        String
+  supportedPetTypes  String[]                 @default([])
+  maxPets            Int                      @default(3)
+  city               String
+  address            String
+  emergencyContact   String
+  isAvailable        Boolean                  @default(true)
+  venuePhotoUrl      String?
+  ratingAverage      Float                    @default(0)
+  totalReviews       Int                      @default(0)
+  verificationStatus SitterVerificationStatus @default(PENDING)
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+
+  user              User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  images            SitterImage[]
+  availabilitySlots SitterAvailability[]
+  bookings          SittingBooking[]     @relation("SitterBookings")
+  reviews           SitterReview[]
+
+  @@index([userId])
+  @@index([verificationStatus])
+  @@index([city])
+  @@index([ratingAverage])
+}
+
+model SitterImage {
+  id              String   @id @default(cuid())
+  sitterProfileId String
+  imageUrl        String
+  storageKey      String   @unique
+  isPrimary       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  sitterProfile SitterProfile @relation(fields: [sitterProfileId], references: [id], onDelete: Cascade)
+ 
+
+  @@index([sitterProfileId])
+
+}
+
+model SitterAvailability {
+  id              String   @id @default(cuid())
+  sitterProfileId String
+  userId          String
+  startDate       DateTime
+  endDate         DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  sitterProfile SitterProfile @relation(fields: [sitterProfileId], references: [id], onDelete: Cascade)
+  
+  @@index([sitterProfileId, startDate])
+  @@index([userId, startDate])
+}
+
+model SittingBooking {
+  id              String               @id @default(cuid())
+  sitterProfileId String
+  sitterId        String
+  petOwnerId      String
+  petId           String
+  startDate       DateTime
+  endDate         DateTime
+  totalDays       Int
+  ownerNotes      String?
+  emergencyPhone  String
+  status          SittingBookingStatus @default(PENDING)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+
+  sitterProfile SitterProfile @relation("SitterBookings", fields: [sitterProfileId], references: [id], onDelete: Cascade)
+  sitter        User          @relation("BookingsBySitter", fields: [sitterId], references: [id], onDelete: Cascade)
+  petOwner      User          @relation("BookingsByOwner", fields: [petOwnerId], references: [id], onDelete: Cascade)
+  pet           Pet           @relation(fields: [petId], references: [id], onDelete: Cascade)
+  review        SitterReview?
+
+  @@index([sitterProfileId, startDate])
+  @@index([petOwnerId, startDate])
+  @@index([sitterId, startDate])
+  @@index([status])
+}
+
+model SitterReview {
+  id              String   @id @default(cuid())
+  bookingId       String   @unique
+  sitterProfileId String
+  reviewerUserId  String
+  rating          Int
+  comment         String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  booking       SittingBooking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  sitterProfile SitterProfile  @relation(fields: [sitterProfileId], references: [id], onDelete: Cascade)
+  reviewer      User           @relation(fields: [reviewerUserId], references: [id], onDelete: Cascade)
+
+  @@index([sitterProfileId])
+  @@index([reviewerUserId])
+}
+
+model AdminActionLog {
+  id         String   @id @default(cuid())
+  adminId    String
+  action     String
+  entityType String?
+  entityId   String?
+  meta       Json?
+  createdAt  DateTime @default(now())
+  admin      User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId, createdAt])
+}
+
+model PetSitterImage {
+  id        String   @id @default(uuid())
+  imagePath String
+  createdAt DateTime @default(now())
+
+  serviceId String
+  
+}
+
+enum PetType {
+  DOG
+  CAT
+}
+
+enum UserRole {
+  PET_OWNER
+  VET
+  ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum PaymentMethod {
+  INSTAPAY
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum MatchRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
+
+enum SitterVerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum SittingBookingStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  COMPLETED
+}
+
+enum ConversationType {
+  MATCHING
+  SITTING
+}

@@ -1,0 +1,19 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const pets_controller_1 = require("./pets.controller");
+const auth_middleware_1 = require("../../common/middlewares/auth.middleware");
+const prisma_1 = require("../../../generated/prisma");
+const validate_middleware_1 = require("@/common/middlewares/validate.middleware");
+const pets_dto_1 = require("./pets.dto");
+const upload_middleware_1 = require("../../common/middlewares/upload.middleware");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.protect, (0, auth_middleware_1.restrictTo)(prisma_1.UserRole.PET_OWNER));
+router.post("/", (0, validate_middleware_1.validate)(pets_dto_1.CreatePetSchema), pets_controller_1.PetController.createPet);
+router.get("/", pets_controller_1.PetController.getMyPets);
+router.get("/:id", pets_controller_1.PetController.getPet);
+router.patch("/:id", (0, validate_middleware_1.validate)(pets_dto_1.UpdatePetSchema), pets_controller_1.PetController.updatePet);
+router.delete("/:id", pets_controller_1.PetController.deletePet);
+router.post("/:id/image", upload_middleware_1.uploadPet.single("image"), pets_controller_1.PetController.uploadImage);
+exports.default = router;
+//# sourceMappingURL=pets.routes.js.map

@@ -1,0 +1,44 @@
+{
+  "compilerOptions": {
+    // --- Compilation Target ---
+    "target": "ES2022",
+    "lib": ["ES2022"],
+
+    // --- Module System ---
+    // CommonJS is required for ts-node-dev compatibility and all existing imports.
+    // NodeNext would require .js extensions on every local import — avoid for now.
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+
+    // --- Paths ---
+    "rootDir": "./src",
+    "outDir": "./dist",
+    // Path aliases — import from "@/common/..." instead of "../../common/..."
+    // Requires `tsconfig-paths` at runtime: npm install -D tsconfig-paths
+    // Update dev script to: ts-node-dev -r tsconfig-paths/register ...
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
+    // --- Strict Correctness ---
+    "strict": true,                        // Enables all strict type-checks
+    "noUncheckedIndexedAccess": true,      // arr[0] is T | undefined, not T
+    "noImplicitReturns": true,             // Every code path in a function must return
+    "noFallthroughCasesInSwitch": true,    // No accidental switch fall-throughs
+    "exactOptionalPropertyTypes": true,    // Distinguishes undefined from missing key
+
+    // --- Interop & Compatibility ---
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
+    // --- Source Maps (useful for debugging with ts-node-dev) ---
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true
+  },
+
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "generated"]
+}
