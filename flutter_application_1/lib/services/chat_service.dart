@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'api_client.dart';
 import 'auth_storage.dart';
 import '../models/chat_models.dart';
 
 class ChatService {
-  static IO.Socket? _socket;
+  static io.Socket? _socket;
 
   // Decoded from the JWT on connect — avoids depending on a separate SharedPreferences key.
   static String? _currentUserId;
@@ -91,7 +91,7 @@ class ChatService {
   static Future<void> connect() async {
     // If another connect() is already running, wait for it to finish.
     if (_isConnecting) {
-      print('[ChatService] connect() — already in progress, waiting...');
+      debugPrint('[ChatService] connect() — already in progress, waiting...');
       if (_connectCompleter != null) await _connectCompleter!.future;
       return;
     }
@@ -114,7 +114,7 @@ class ChatService {
   static Future<void> _doConnect() async {
     final token = await AuthStorage.getToken();
     if (token == null) {
-      print('[ChatService] _doConnect() — no token, aborting');
+      debugPrint('[ChatService] _doConnect() — no token, aborting');
       _connController.add(false);
       return;
     }
@@ -134,30 +134,30 @@ class ChatService {
     // If already connected as the SAME user, skip reconnect.
     if (_socket != null && _socket!.connected &&
         newUserId != null && _currentUserId == newUserId) {
-      print('[ChatService] _doConnect() — already connected as $newUserId, skipping');
+      debugPrint('[ChatService] _doConnect() — already connected as $newUserId, skipping');
       return;
     }
 
     // Different user or not yet connected — always (re)connect with fresh socket.
     if (_socket != null) {
-      print('[ChatService] _doConnect() — account changed or stale socket, reconnecting');
+      debugPrint('[ChatService] _doConnect() — account changed or stale socket, reconnecting');
       _socket!.disconnect();
       _socket!.dispose();
       _socket = null;
     }
 
     _currentUserId = newUserId;
-    print('[ChatService] _doConnect() — userId=$_currentUserId');
+    debugPrint('[ChatService] _doConnect() — userId=$_currentUserId');
 
     // Android emulator reaches host via 10.0.2.2; web uses localhost.
     final url = kIsWeb ? 'http://localhost:3000' : 'http://10.0.2.2:3000';
-    print('[ChatService] connecting to $url ...');
+    debugPrint('[ChatService] connecting to $url ...');
 
     // enableForceNew() bypasses the socket.io-client URL-level Manager cache,
     // ensuring a brand-new authenticated socket every time we (re)connect.
-    _socket = IO.io(
+    _socket = io.io(
       url,
-      IO.OptionBuilder()
+      io.OptionBuilder()
           .setTransports(['websocket'])
           .setAuth({'token': token})
           .disableAutoConnect()
@@ -165,10 +165,10 @@ class ChatService {
           .build(),
     );
 
-    print('[ChatService] socket created, registering handlers...');
+    debugPrint('[ChatService] socket created, registering handlers...');
 
     _socket!.onConnect((_) {
-      print('[ChatService] socket CONNECTED ✅  userId=$_currentUserId');
+      debugPrint('[ChatService] socket CONNECTED ✅  userId=$_currentUserId');
       _connController.add(true);
       for (final roomId in _joinedRooms) {
         _socket!.emit('join_room', {'conversationId': roomId});
@@ -176,12 +176,12 @@ class ChatService {
     });
 
     _socket!.onDisconnect((_) {
-      print('[ChatService] socket DISCONNECTED');
+      debugPrint('[ChatService] socket DISCONNECTED');
       _connController.add(false);
     });
 
     _socket!.onConnectError((err) {
-      print('[ChatService] socket CONNECT ERROR: $err');
+      debugPrint('[ChatService] socket CONNECT ERROR: $err');
       _connController.add(false);
     });
 
@@ -189,7 +189,7 @@ class ChatService {
       try {
         final data = _unwrap(raw);
         final msg = ChatMessage.fromJson(data);
-        print('[ChatService] receive_message  senderId=${msg.senderId}  convId=${msg.conversationId}  _currentUserId=$_currentUserId');
+        debugPrint('[ChatService] receive_message  senderId=${msg.senderId}  convId=${msg.conversationId}  _currentUserId=$_currentUserId');
         _msgController.add(msg);
       } catch (_) {}
     });
@@ -212,7 +212,7 @@ class ChatService {
     });
 
     _socket!.connect();
-    print('[ChatService] socket.connect() called for userId=$_currentUserId');
+    debugPrint('[ChatService] socket.connect() called for userId=$_currentUserId');
   }
 
   static Map<String, dynamic> _unwrap(dynamic raw) {
@@ -228,7 +228,7 @@ class ChatService {
   }
 
   static void sendMessage(String conversationId, String content) {
-    print('[ChatService] sendMessage  _currentUserId=$_currentUserId  connected=${_socket?.connected}  convId=$conversationId');
+    debugPrint('[ChatService] sendMessage  _currentUserId=$_currentUserId  connected=${_socket?.connected}  convId=$conversationId');
     _socket?.emit(
         'send_message', {'conversationId': conversationId, 'content': content});
   }

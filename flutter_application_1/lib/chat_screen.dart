@@ -83,11 +83,11 @@ class _ChatScreenState extends State<ChatScreen> {
 
     // ── Auth diagnostic ──────────────────────────────────────────────────────
     final diagToken = await AuthStorage.getToken();
-    print('\n==== ChatScreen._init ====');
-    print('  userId  : ${_currentUserId ?? "NULL — NOT LOGGED IN"}');
-    print('  token   : ${diagToken != null ? "EXISTS (${diagToken.length} chars)" : "NULL — NOT LOGGED IN"}');
-    print('  convId  : ${widget.conversationId ?? "null (demo mode)"}');
-    print('==========================\n');
+    debugPrint('\n==== ChatScreen._init ====');
+    debugPrint('  userId  : ${_currentUserId ?? "NULL — NOT LOGGED IN"}');
+    debugPrint('  token   : ${diagToken != null ? "EXISTS (${diagToken.length} chars)" : "NULL — NOT LOGGED IN"}');
+    debugPrint('  convId  : ${widget.conversationId ?? "null (demo mode)"}');
+    debugPrint('==========================\n');
     if (mounted) {
       final ok = diagToken != null && _currentUserId != null;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -133,7 +133,7 @@ class _ChatScreenState extends State<ChatScreen> {
         .listen((chatMsg) {
       if (!mounted) return;
       final bool isFromMe = chatMsg.senderId == _currentUserId;
-      print('[_msgSub] senderId=${chatMsg.senderId}  _currentUserId=$_currentUserId  isFromMe=$isFromMe  text="${chatMsg.content}"');
+      debugPrint('[_msgSub] senderId=${chatMsg.senderId}  _currentUserId=$_currentUserId  isFromMe=$isFromMe  text="${chatMsg.content}"');
       setState(() {
         if (isFromMe) {
           final alreadyConfirmed =
@@ -210,12 +210,12 @@ class _ChatScreenState extends State<ChatScreen> {
     try {
       final msgs = await ChatService.getMessages(widget.conversationId!);
       if (!mounted) return;
-      print('\n==== _loadHistory ====');
-      print('  _currentUserId : $_currentUserId');
+      debugPrint('\n==== _loadHistory ====');
+      debugPrint('  _currentUserId : $_currentUserId');
       for (final m in msgs) {
-        print('  msg senderId=${m.senderId}  isMine=${m.senderId == _currentUserId}  text="${m.content}"');
+        debugPrint('  msg senderId=${m.senderId}  isMine=${m.senderId == _currentUserId}  text="${m.content}"');
       }
-      print('======================\n');
+      debugPrint('======================\n');
       setState(() {
         _messages.clear();
         _messages.addAll(msgs.map((m) => Message(

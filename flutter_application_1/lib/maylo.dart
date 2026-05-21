@@ -9,7 +9,6 @@ class MayloProfile extends StatelessWidget {
     // Standard color palette from Figma/design
     const Color primaryPink = Color(0xFFFFC7C8);
     const Color accentCoral = Color(0xFFFF7578);
-    const Color textDark = Colors.black;
     const Color textGrey = Color(0xFF8D8D8D);
 
     return Container(
