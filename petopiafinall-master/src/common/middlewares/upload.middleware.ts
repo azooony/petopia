@@ -50,3 +50,9 @@ export const uploadAnalyze = multer({
   fileFilter: imageFilter,
   limits,
 });
+
+export const uploadLostFound = multer({
+  storage: makeStorage("uploads/lost-found/"),
+  fileFilter: imageFilter,
+  limits,
+});

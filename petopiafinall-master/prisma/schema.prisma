@@ -33,8 +33,7 @@ model User {
   pets                     Pet?
   ownerProfile             PetOwnerProfile?
   recognitionLogs          PetRecognitionLog[]
- 
-  
+
   availabilitySlots        VetAvailabilitySlot[]
   vetProfile               VetProfile?
   sitterProfile            SitterProfile?
@@ -42,6 +41,9 @@ model User {
   sittingBookingsAsSitter  SittingBooking[]          @relation("BookingsBySitter")
   sittingBookingsAsOwner   SittingBooking[]          @relation("BookingsByOwner")
   sitterReviews            SitterReview[]
+
+  lostReports              LostFoundReport[]         @relation("LostReports")
+  foundReports             LostFoundReport[]         @relation("FoundReports")
 }
 
 model PetOwnerProfile {
@@ -450,6 +452,59 @@ model PetSitterImage {
 
   serviceId String
   
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Lost & Found Module
+// ─────────────────────────────────────────────────────────────────────────────
+
+model LostFoundReport {
+  id          String          @id @default(cuid())
+  status      LostFoundStatus
+  species     PetType
+  breed       String?
+  gender      Gender?
+  color       String?
+  description String
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  // LOST-specific fields
+  name             String?
+  lastSeenLocation String?
+  lastSeenDate     DateTime?
+  ownerId          String?
+  owner            User?           @relation("LostReports", fields: [ownerId], references: [id], onDelete: SetNull)
+
+  // FOUND-specific fields
+  foundLocation        String?
+  isPetStillAtLocation Boolean         @default(true)
+  finderId             String?
+  finder               User?           @relation("FoundReports", fields: [finderId], references: [id], onDelete: SetNull)
+
+  images LostFoundImage[]
+
+  @@index([status])
+  @@index([species])
+  @@index([ownerId])
+  @@index([finderId])
+  @@index([createdAt])
+}
+
+model LostFoundImage {
+  id         String          @id @default(cuid())
+  reportId   String
+  url        String
+  storageKey String?         @unique
+  createdAt  DateTime        @default(now())
+  report     LostFoundReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
+}
+
+enum LostFoundStatus {
+  LOST
+  FOUND
 }
 
 enum PetType {
