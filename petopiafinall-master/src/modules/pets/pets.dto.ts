@@ -1,4 +1,4 @@
-import { Gender } from "../../../generated/prisma";
+import { Gender, PetType } from "../../../generated/prisma";
 import { z } from "zod";
 
 export const CreatePetSchema = z.object({
@@ -8,6 +8,7 @@ export const CreatePetSchema = z.object({
   gender: z.enum([Gender.MALE, Gender.FEMALE]).optional().nullable(),
   description: z.string().max(1000).optional().nullable(),
   photo: z.string().optional().nullable(),
+  petType: z.enum([PetType.DOG, PetType.CAT]).optional(),
 });
 
 export const UpdatePetSchema = CreatePetSchema.partial();

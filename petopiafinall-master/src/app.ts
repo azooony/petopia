@@ -13,6 +13,7 @@ import sittingRoutes from "./modules/sitting/sitting.routes";
 import matchingRoutes from "./modules/matching/petMatching.routes";
 import chatRoutes from "./modules/chat/chat.routes";
 import lostFoundRoutes from "./modules/lostFound/lostFound.routes";
+import aiRoutes from "./modules/ai/ai.routes";
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.use("/pets", petRoutes);
 app.use("/matching", matchingRoutes);
 app.use("/chat", chatRoutes);
 app.use("/lost-found", lostFoundRoutes);
+app.use("/ai", aiRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({

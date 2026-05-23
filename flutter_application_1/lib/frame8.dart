@@ -11,6 +11,7 @@ import 'services/auth_storage.dart';
 import 'services/chat_service.dart';
 import 'chat_list_screen.dart';
 import 'lost_found_selection.dart';
+import 'widgets/floating_chat_bubble.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Frame8 – Home screen  (Figma design: Plus Jakarta Sans, coral #FF7578 palette)
@@ -156,6 +157,9 @@ class _Frame8State extends State<Frame8> {
                   left: 20,
                   right: 20,
                   child: _buildBottomNav(),
+                ),
+                const Positioned.fill(
+                  child: FloatingChatBubble(),
                 ),
               ],
             ),

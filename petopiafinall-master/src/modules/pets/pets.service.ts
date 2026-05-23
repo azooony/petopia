@@ -38,6 +38,7 @@ export class PetService {
       breed: dto.breed ?? null,
       gender: dto.gender ?? null,
       description: dto.description ?? null,
+      ...(dto.petType !== undefined && { petType: dto.petType }),
     });
   }
 
@@ -81,6 +82,7 @@ export class PetService {
       ...(dto.breed !== undefined && { breed: dto.breed }),
       ...(dto.gender !== undefined && { gender: dto.gender }),
       ...(dto.description !== undefined && { description: dto.description }),
+      ...(dto.petType !== undefined && { petType: dto.petType }),
     });
   }
 

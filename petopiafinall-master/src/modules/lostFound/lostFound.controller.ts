@@ -81,7 +81,7 @@ export class LostFoundController {
 
   static deleteFoundReport = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
-      await LostFoundService.deleteFoundReport(req.user!.userId, req.params.id);
+      await LostFoundService.deleteFoundReport(req.user!.userId, req.params['id'] as string);
       res.json({
         success: true,
         message: "Found pet report deleted successfully",
