@@ -143,7 +143,7 @@ class _BookAppointmentState extends State<BookAppointment> {
                         borderRadius: BorderRadius.circular(28)),
                     elevation: 0,
                   ),
-                  child: Text('Confirm & Pay',
+                  child: Text('Confirm',
                       style: GoogleFonts.plusJakartaSans(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -155,90 +155,104 @@ class _BookAppointmentState extends State<BookAppointment> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Stack(
-                    children: [
-                      SizedBox(
-                        height: 260,
-                        width: double.infinity,
-                        child: Image(image: _resolvePhoto(), fit: BoxFit.cover),
-                      ),
-                      Positioned(
-                        bottom: 0, left: 0, right: 0,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 14, horizontal: 20),
-                          color: _coral,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(widget.doctorName,
+                  // ── OVERLAPPING HEADER (Stack) ──────────────────────────
+                  // Total SizedBox height = 280 px image + 40 px lower half
+                  // of the info card, so the card straddles the boundary.
+                  SizedBox(
+                    height: 320,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        // ── Doctor photo (top 280 px, rounded bottom) ──
+                        Positioned(
+                          top: 0, left: 0, right: 0, bottom: 40,
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              bottomLeft: Radius.circular(32),
+                              bottomRight: Radius.circular(32),
+                            ),
+                            child: Image(
+                              image: _resolvePhoto(),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        // ── Floating name/title card overlapping image ──
+                        // bottom: 0 anchors it to the SizedBox base so the
+                        // upper half sits on the image and the lower half
+                        // extends into the content, creating the overlap.
+                        Positioned(
+                          bottom: 0, left: 24, right: 24,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 18, horizontal: 20),
+                            decoration: BoxDecoration(
+                              color: _coral,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: _coral.withValues(alpha: 0.28),
+                                  blurRadius: 16,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  widget.doctorName.startsWith('Dr') ? widget.doctorName : 'Dr. ${widget.doctorName}',
+                                  textAlign: TextAlign.center,
                                   style: GoogleFonts.plusJakartaSans(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w700,
-                                      color: Colors.white)),
-                              const SizedBox(height: 2),
-                              Text('Senior Cardiologist and Surgeon',
+                                      color: Colors.white),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Senior Cardiologist and Surgeon',
+                                  textAlign: TextAlign.center,
                                   style: GoogleFonts.plusJakartaSans(
                                       fontSize: 13,
-                                      color: Colors.white.withValues(alpha: 0.9))),
-                            ],
+                                      color: Colors.white
+                                          .withValues(alpha: 0.88)),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-                      Positioned(
-                        top: 48, left: 16,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
+                        // ── Circular white back button ──
+                        Positioned(
+                          top: 48, left: 16,
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.12),
                                   blurRadius: 8,
-                                  offset: const Offset(0, 2))
-                            ],
-                          ),
-                          child: IconButton(
-                            icon: const Icon(Icons.arrow_back, size: 20),
-                            onPressed: () => Navigator.pop(context),
-                            padding: const EdgeInsets.all(8),
-                            constraints: const BoxConstraints(),
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: IconButton(
+                              icon: const Icon(Icons.arrow_back, size: 18),
+                              onPressed: () => Navigator.pop(context),
+                              padding: EdgeInsets.zero,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+                    padding: const EdgeInsets.fromLTRB(20, 28, 20, 16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFF0F0),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.attach_money_rounded,
-                                  color: _coral, size: 18),
-                              const SizedBox(width: 6),
-                              Text('Consultation fee: ',
-                                  style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 13,
-                                      color: const Color(0xFF9E9E9E))),
-                              Text(widget.fee,
-                                  style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: _coral)),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 20),
                         Text('Appointment',
                             style: GoogleFonts.plusJakartaSans(
                                 fontSize: 17,
@@ -485,7 +499,7 @@ class _PaymentSheetState extends State<_PaymentSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _summaryRow(Icons.person_outline_rounded, widget.doctorName),
+                  _summaryRow(Icons.person_outline_rounded, widget.doctorName.startsWith('Dr') ? widget.doctorName : 'Dr. ${widget.doctorName}'),
                   const SizedBox(height: 8),
                   _summaryRow(Icons.calendar_today_rounded, widget.day),
                   const SizedBox(height: 8),
@@ -806,7 +820,7 @@ class _ConfirmationDialog extends StatelessWidget {
             Text(
               'Your payment screenshot has been submitted. '
               'Please wait while the admin verifies your InstaPay payment '
-              'for your appointment with $doctorName on $day at $time.',
+              'for your appointment with ${doctorName.startsWith('Dr') ? doctorName : 'Dr. $doctorName'} on $day at $time.',
               textAlign: TextAlign.center,
               style: GoogleFonts.plusJakartaSans(
                   fontSize: 13, color: Colors.grey[600], height: 1.5),

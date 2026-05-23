@@ -86,6 +86,14 @@ class ChatService {
         .toList();
   }
 
+  static Future<void> deleteConversation(String conversationId) async {
+    await ApiClient.delete('/chat/conversations/$conversationId');
+  }
+
+  static Future<void> blockUser(String targetUserId) async {
+    await ApiClient.post('/users/$targetUserId/block', {});
+  }
+
   // ── Socket ────────────────────────────────────────────────────────────────
 
   static Future<void> connect() async {

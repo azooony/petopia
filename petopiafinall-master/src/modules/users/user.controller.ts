@@ -124,4 +124,40 @@ export class UserController {
       next(err);
     }
   };
+
+  // POST /users/me/avatar - Upload profile picture
+  static uploadAvatar = async (
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      if (!req.user?.userId) throw new AppError("Unauthorized", 401);
+      if (!req.file) throw new AppError("Image file is required", 400);
+
+      const avatarUrl = `${req.protocol}://${req.get("host")}/uploads/avatars/${req.file.filename}`;
+      const user = await UserService.uploadAvatar(req.user.userId, avatarUrl);
+
+      res.json({
+        success: true,
+        message: "Avatar uploaded successfully",
+        data: user,
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  // POST /users/:targetUserId/block
+  static blockUser = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      if (!req.user?.userId) throw new AppError("Unauthorized", 401);
+      const targetUserId = req.params['targetUserId'] as string;
+      if (!targetUserId) return next(new AppError("targetUserId is required.", 400));
+      await UserService.blockUser(req.user.userId, targetUserId);
+      res.json({ success: true, message: "User blocked.", data: null });
+    } catch (err) {
+      next(err);
+    }
+  };
 }

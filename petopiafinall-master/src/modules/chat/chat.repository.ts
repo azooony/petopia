@@ -20,7 +20,7 @@ export class ChatRepository {
       },
       include: {
         participants: {
-          include: { user: { select: { id: true, fullName: true } } },
+          include: { user: { select: { id: true, fullName: true, profilePicture: true } } },
         },
         messages: { orderBy: { createdAt: "desc" }, take: 1 },
       },
@@ -44,7 +44,7 @@ export class ChatRepository {
       },
       include: {
         participants: {
-          include: { user: { select: { id: true, fullName: true } } },
+          include: { user: { select: { id: true, fullName: true, profilePicture: true } } },
         },
       },
     });
@@ -67,7 +67,7 @@ export class ChatRepository {
       },
       include: {
         participants: {
-          include: { user: { select: { id: true, fullName: true } } },
+          include: { user: { select: { id: true, fullName: true, profilePicture: true } } },
         },
       },
     });
@@ -83,7 +83,7 @@ export class ChatRepository {
       },
       include: {
         participants: {
-          include: { user: { select: { id: true, fullName: true } } },
+          include: { user: { select: { id: true, fullName: true, profilePicture: true } } },
         },
       },
     });
@@ -96,7 +96,7 @@ export class ChatRepository {
       where: { participants: { some: { userId } } },
       include: {
         participants: {
-          include: { user: { select: { id: true, fullName: true } } },
+          include: { user: { select: { id: true, fullName: true, profilePicture: true } } },
         },
         messages: { orderBy: { createdAt: "desc" }, take: 1 },
       },
@@ -109,7 +109,7 @@ export class ChatRepository {
   static getMessages(conversationId: string, page = 1, limit = 50) {
     return prisma.chatMessage.findMany({
       where: { conversationId },
-      include: { sender: { select: { id: true, fullName: true } } },
+      include: { sender: { select: { id: true, fullName: true, profilePicture: true } } },
       orderBy: { createdAt: "asc" },
       skip: (page - 1) * limit,
       take: limit,
@@ -133,6 +133,12 @@ export class ChatRepository {
     return rows.map((r) => r.userId);
   }
 
+  // ── Delete a conversation (cascade removes participants + messages) ─────────
+
+  static deleteConversation(conversationId: string) {
+    return prisma.conversation.delete({ where: { id: conversationId } });
+  }
+
   // ── Persist a message and bump conversation.updatedAt ─────────────────────
 
   static async saveMessage(data: {
@@ -143,7 +149,7 @@ export class ChatRepository {
     return prisma.$transaction(async (tx) => {
       const message = await tx.chatMessage.create({
         data,
-        include: { sender: { select: { id: true, fullName: true } } },
+        include: { sender: { select: { id: true, fullName: true, profilePicture: true } } },
       });
       await tx.conversation.update({
         where: { id: data.conversationId },

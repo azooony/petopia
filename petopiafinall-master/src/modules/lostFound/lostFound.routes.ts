@@ -27,4 +27,6 @@ router.post(
 
 router.get("/found", protect, LostFoundController.getFoundReports);
 
+router.delete("/found/:id", protect, LostFoundController.deleteFoundReport);
+
 export default router;

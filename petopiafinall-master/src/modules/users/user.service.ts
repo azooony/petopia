@@ -61,6 +61,7 @@ export class UserService {
       createdAt: safeUser.createdAt,
       age: safeUser.age,
       gender: safeUser.gender,
+      profilePicture: (safeUser as any).profilePicture ?? null,
       address: ownerProfile?.address ?? '',
       pets: safeUser.role === "PET_OWNER" ? (safeUser as any).pets ?? null : null,
       profile:
@@ -287,5 +288,35 @@ export class UserService {
       message: "Profile deleted successfully",
       userId,
     };
+  }
+
+  // UPLOAD AVATAR
+
+  static async uploadAvatar(userId: string, avatarUrl: string) {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) throw new AppError("User not found", 404);
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { profilePicture: avatarUrl },
+    });
+
+    return this.getMe(userId);
+  }
+
+  // BLOCK USER
+
+  static async blockUser(blockerId: string, blockedId: string) {
+    if (blockerId === blockedId) {
+      throw new AppError("You cannot block yourself.", 400);
+    }
+    const target = await prisma.user.findUnique({ where: { id: blockedId } });
+    if (!target) throw new AppError("User not found.", 404);
+
+    await prisma.userBlock.upsert({
+      where: { blockerId_blockedId: { blockerId, blockedId } },
+      create: { blockerId, blockedId },
+      update: {},
+    });
   }
 }

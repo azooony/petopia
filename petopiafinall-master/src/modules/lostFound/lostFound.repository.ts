@@ -96,4 +96,10 @@ export class LostFoundRepository {
       include: reportInclude,
     });
   }
+
+  static async deleteFoundReport(id: string, finderId: string) {
+    return prisma.lostFoundReport.deleteMany({
+      where: { id, finderId, status: LostFoundStatus.FOUND },
+    });
+  }
 }

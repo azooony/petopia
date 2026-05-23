@@ -28,6 +28,9 @@ class _UserProfileState extends State<UserProfile> {
   final _ageFocus       = FocusNode();
   final _aboutFocus     = FocusNode();
 
+  Uint8List? _avatarBytes;
+  String? _existingAvatarUrl;
+
   Uint8List? _petPhotoBytes;
   String? _existingPetImageUrl;
   String _gender      = 'Male';
@@ -82,6 +85,13 @@ class _UserProfileState extends State<UserProfile> {
       _ownerNameController.text = user['fullName'] as String? ?? '';
       _addressController.text   = profile['address'] as String? ?? '';
 
+      final avatarRaw = user['profilePicture'] as String?;
+      if (avatarRaw != null && avatarRaw.isNotEmpty) {
+        _existingAvatarUrl = avatarRaw.startsWith('http')
+            ? avatarRaw
+            : '${ApiClient.baseUrl}$avatarRaw';
+      }
+
       final gender = user['gender'] as String?;
       if (gender == 'FEMALE') _gender = 'Female';
 
@@ -116,6 +126,18 @@ class _UserProfileState extends State<UserProfile> {
     } finally {
       if (mounted) setState(() => _initialLoad = false);
     }
+  }
+
+  Future<void> _pickAvatar() async {
+    final file = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 512,
+      maxHeight: 512,
+      imageQuality: 85,
+    );
+    if (file == null) return;
+    final bytes = await file.readAsBytes();
+    setState(() => _avatarBytes = bytes);
   }
 
   Future<void> _pickPhoto() async {
@@ -185,6 +207,21 @@ class _UserProfileState extends State<UserProfile> {
       } else {
         final res = await ApiClient.post('/pets', petPayload);
         _petId = (res['data'] as Map<String, dynamic>?)?['id'] as String?;
+      }
+
+      // Upload user avatar if a new one was picked
+      if (_avatarBytes != null) {
+        final res = await ApiClient.multipartPostBytes(
+          '/users/me/avatar',
+          fields: {},
+          bytes: _avatarBytes!,
+          filename: 'avatar_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          fileField: 'avatar',
+        );
+        final url = (res['data'] as Map<String, dynamic>?)?['profilePicture'] as String?;
+        if (url != null && mounted) {
+          setState(() { _existingAvatarUrl = url; _avatarBytes = null; });
+        }
       }
 
       // Upload pet photo — blocking so any failure shows a clear error
@@ -378,14 +415,29 @@ class _UserProfileState extends State<UserProfile> {
                                   // Photos
                                   Text('photos', style: _labelStyle()),
                                   const SizedBox(height: 10),
-                                  GestureDetector(
-                                    onTap: _pickPhoto,
-                                    child: _buildPhotoBox(
-                                      bytes: _petPhotoBytes,
-                                      networkUrl: _existingPetImageUrl,
-                                      size: 100,
-                                      label: 'pet',
-                                    ),
+                                  Row(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: _pickAvatar,
+                                        child: _buildPhotoBox(
+                                          bytes: _avatarBytes,
+                                          networkUrl: _existingAvatarUrl,
+                                          size: 100,
+                                          label: 'you',
+                                          icon: Icons.person_outline,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      GestureDetector(
+                                        onTap: _pickPhoto,
+                                        child: _buildPhotoBox(
+                                          bytes: _petPhotoBytes,
+                                          networkUrl: _existingPetImageUrl,
+                                          size: 100,
+                                          label: 'pet',
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                   const SizedBox(height: 28),
 
@@ -536,7 +588,13 @@ class _UserProfileState extends State<UserProfile> {
     );
   }
 
-  Widget _buildPhotoBox({required Uint8List? bytes, String? networkUrl, required double size, required String label}) {
+  Widget _buildPhotoBox({
+    required Uint8List? bytes,
+    String? networkUrl,
+    required double size,
+    required String label,
+    IconData icon = Icons.image_outlined,
+  }) {
     return Container(
       width: size,
       height: size,
@@ -552,37 +610,42 @@ class _UserProfileState extends State<UserProfile> {
           : networkUrl != null
               ? ClipRRect(
                   borderRadius: BorderRadius.circular(13),
-                  child: Image.network(networkUrl, fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(Icons.pets, color: Color(0xFFFF7578), size: 36)),
+                  child: Image.network(
+                    networkUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) =>
+                        Icon(icon, color: const Color(0xFFFF7578), size: 36),
+                  ),
                 )
               : Stack(
-              alignment: Alignment.center,
-              children: [
-                Icon(Icons.image_outlined, size: 30, color: Colors.grey[400]),
-                Positioned(
-                  bottom: 8,
-                  right: 8,
-                  child: Container(
-                    width: 20,
-                    height: 20,
-                    decoration: const BoxDecoration(color: _coral, shape: BoxShape.circle),
-                    child: const Icon(Icons.add, color: Colors.white, size: 12),
-                  ),
-                ),
-                Positioned(
-                  bottom: 6,
-                  left: 6,
-                  child: Text(
-                    label,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey[500],
+                  alignment: Alignment.center,
+                  children: [
+                    Icon(icon, size: 30, color: Colors.grey[400]),
+                    Positioned(
+                      bottom: 8,
+                      right: 8,
+                      child: Container(
+                        width: 20,
+                        height: 20,
+                        decoration: const BoxDecoration(
+                            color: _coral, shape: BoxShape.circle),
+                        child: const Icon(Icons.add, color: Colors.white, size: 12),
+                      ),
                     ),
-                  ),
+                    Positioned(
+                      bottom: 6,
+                      left: 6,
+                      child: Text(
+                        label,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey[500],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
     );
   }
 

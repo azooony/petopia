@@ -6,6 +6,7 @@ import 'services/chat_service.dart';
 import 'services/auth_storage.dart';
 import 'services/api_client.dart';
 import 'chat_screen.dart';
+import 'petopia_bottom_nav.dart';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
@@ -22,15 +23,20 @@ class _ChatListScreenState extends State<ChatListScreen> {
   static const _bgGrey   = Color(0xFFF6F6F6);
 
   List<Conversation> _conversations = [];
-  bool   _isLoading = true;
+  bool    _isLoading = true;
   String? _error;
   String? _myUserId;
+
+  final _searchController = TextEditingController();
+  final _searchFocus      = FocusNode();
+  String _searchQuery     = '';
 
   StreamSubscription? _msgSub;
 
   @override
   void initState() {
     super.initState();
+    _searchFocus.addListener(() => setState(() {}));
     _load();
     ChatService.connect();
     _msgSub = ChatService.messageStream.listen((_) => _load());
@@ -39,6 +45,8 @@ class _ChatListScreenState extends State<ChatListScreen> {
   @override
   void dispose() {
     _msgSub?.cancel();
+    _searchController.dispose();
+    _searchFocus.dispose();
     super.dispose();
   }
 
@@ -56,6 +64,26 @@ class _ChatListScreenState extends State<ChatListScreen> {
     }
   }
 
+  List<Conversation> get _filtered {
+    if (_searchQuery.isEmpty) return _conversations;
+    final q = _searchQuery.toLowerCase();
+    return _conversations.where((conv) {
+      final name = conv.otherParticipantName(_myUserId ?? '').toLowerCase();
+      final type = _typeLabel(conv.type).toLowerCase();
+      return name.contains(q) || type.contains(q);
+    }).toList();
+  }
+
+  String _typeLabel(String type) {
+    switch (type.toUpperCase()) {
+      case 'MATCHING': return 'Match';
+      case 'SITTING':  return 'Sitting';
+      case 'LOST_PET': return 'Lost Pet';
+      case 'FOUND_PET': return 'Found Pet';
+      default: return 'Chat';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -68,13 +96,18 @@ class _ChatListScreenState extends State<ChatListScreen> {
             borderRadius: BorderRadius.circular(30),
           ),
           clipBehavior: Clip.antiAlias,
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: Column(
-              children: [
-                _buildHeader(),
-                Expanded(child: _buildBody()),
-              ],
+          child: MediaQuery.removePadding(
+            context: context,
+            removeTop: true,
+            child: Scaffold(
+              backgroundColor: Colors.transparent,
+              bottomNavigationBar: const PetopiaBottomNav(activeIndex: 1),
+              body: Column(
+                children: [
+                  _buildHeader(),
+                  Expanded(child: _buildBody()),
+                ],
+              ),
             ),
           ),
         ),
@@ -83,53 +116,84 @@ class _ChatListScreenState extends State<ChatListScreen> {
   }
 
   Widget _buildHeader() {
+    final focused  = _searchFocus.hasFocus;
+    final hasText  = _searchController.text.isNotEmpty;
     return Container(
       color: Colors.white,
       child: SafeArea(
+        top: false,
         bottom: false,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(8, 8, 16, 0),
-              child: Row(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: const Icon(Icons.arrow_back_ios_new_rounded,
                         color: _darkText, size: 20),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(height: 8),
                   Text('messages',
                       style: GoogleFonts.plusJakartaSans(
                           fontSize: 22,
                           fontWeight: FontWeight.w800,
                           color: _darkText)),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: _isLoading ? null : _load,
-                    child: Container(
-                      width: 38, height: 38,
-                      decoration: BoxDecoration(
-                        color: _isLoading ? _bgGrey : _pink,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: _isLoading
-                          ? const Center(
-                              child: SizedBox(
-                                width: 16, height: 16,
-                                child: CircularProgressIndicator(
-                                    strokeWidth: 2, color: _coral),
-                              ),
-                            )
-                          : const Icon(Icons.refresh_rounded,
-                              color: _coral, size: 20),
-                    ),
-                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 12),
-            Container(height: 3, color: _coral),
+            const SizedBox(height: 10),
+            // ── Search bar ────────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                height: 44,
+                decoration: BoxDecoration(
+                  color: focused ? const Color(0xFFFFF5F5) : const Color(0xFFF6F6F6),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: focused ? _coral : Colors.transparent,
+                    width: focused ? 1.5 : 1.0,
+                  ),
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  focusNode: _searchFocus,
+                  onChanged: (v) => setState(() => _searchQuery = v),
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13,
+                      color: _darkText,
+                      fontWeight: FontWeight.w500),
+                  decoration: InputDecoration(
+                    hintText: 'Search by name or type...',
+                    hintStyle: GoogleFonts.plusJakartaSans(
+                        fontSize: 13, color: const Color(0xFFB0B0B0)),
+                    prefixIcon: Icon(Icons.search_rounded,
+                        size: 18,
+                        color: focused ? _coral : const Color(0xFFB0B0B0)),
+                    prefixIconConstraints:
+                        const BoxConstraints(minWidth: 40, minHeight: 0),
+                    suffixIcon: hasText
+                        ? GestureDetector(
+                            onTap: () {
+                              _searchController.clear();
+                              setState(() => _searchQuery = '');
+                            },
+                            child: const Icon(Icons.close_rounded,
+                                size: 16, color: Color(0xFFB0B0B0)),
+                          )
+                        : null,
+                    border: InputBorder.none,
+                    contentPadding:
+                        const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -149,29 +213,39 @@ class _ChatListScreenState extends State<ChatListScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 80, height: 80,
+                width: 80,
+                height: 80,
                 decoration: BoxDecoration(
-                    color: _pink, borderRadius: BorderRadius.circular(24)),
-                child: const Icon(Icons.wifi_off_rounded, color: _coral, size: 40),
+                    color: _pink,
+                    borderRadius: BorderRadius.circular(24)),
+                child: const Icon(Icons.wifi_off_rounded,
+                    color: _coral, size: 40),
               ),
               const SizedBox(height: 20),
               Text('Connection error',
                   style: GoogleFonts.plusJakartaSans(
-                      fontSize: 18, fontWeight: FontWeight.w700, color: _darkText)),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: _darkText)),
               const SizedBox(height: 8),
               Text(_error!,
-                  style: GoogleFonts.plusJakartaSans(fontSize: 13, color: _greyText),
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13, color: _greyText),
                   textAlign: TextAlign.center),
               const SizedBox(height: 24),
               GestureDetector(
                 onTap: _load,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 28, vertical: 14),
                   decoration: BoxDecoration(
-                      color: _coral, borderRadius: BorderRadius.circular(16)),
+                      color: _coral,
+                      borderRadius: BorderRadius.circular(16)),
                   child: Text('Try again',
                       style: GoogleFonts.plusJakartaSans(
-                          color: Colors.white, fontWeight: FontWeight.w700, fontSize: 14)),
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14)),
                 ),
               ),
             ],
@@ -179,7 +253,9 @@ class _ChatListScreenState extends State<ChatListScreen> {
         ),
       );
     }
-    if (_conversations.isEmpty) {
+
+    final items = _filtered;
+    if (items.isEmpty) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
@@ -187,32 +263,45 @@ class _ChatListScreenState extends State<ChatListScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 100, height: 100,
+                width: 100,
+                height: 100,
                 decoration: BoxDecoration(
-                    color: _pink, borderRadius: BorderRadius.circular(30)),
-                child: const Icon(Icons.forum_outlined, color: _coral, size: 52),
+                    color: _pink,
+                    borderRadius: BorderRadius.circular(30)),
+                child: const Icon(Icons.forum_outlined,
+                    color: _coral, size: 52),
               ),
               const SizedBox(height: 24),
-              Text('No chats yet',
-                  style: GoogleFonts.plusJakartaSans(
-                      fontSize: 20, fontWeight: FontWeight.w800, color: _darkText)),
+              Text(
+                _searchQuery.isEmpty ? 'No chats yet' : 'No results found',
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: _darkText),
+              ),
               const SizedBox(height: 10),
-              Text('Tap "Message Owner" on any pet\nprofile to start chatting.',
-                  style: GoogleFonts.plusJakartaSans(
-                      fontSize: 14, color: _greyText, height: 1.55),
-                  textAlign: TextAlign.center),
+              Text(
+                _searchQuery.isEmpty
+                    ? 'Tap "Message" on any pet profile\nto start chatting.'
+                    : 'Try a different name or type.',
+                style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14, color: _greyText, height: 1.55),
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
         ),
       );
     }
+
     return RefreshIndicator(
       color: _coral,
       onRefresh: _load,
-      child: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        itemCount: _conversations.length,
-        itemBuilder: (_, i) => _buildTile(_conversations[i]),
+      child: ListView.separated(
+        padding: const EdgeInsets.all(16),
+        itemCount: items.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        itemBuilder: (_, i) => _buildTile(items[i]),
       ),
     );
   }
@@ -220,10 +309,12 @@ class _ChatListScreenState extends State<ChatListScreen> {
   Widget _buildTile(Conversation conv) {
     final myId    = _myUserId ?? '';
     final name    = conv.otherParticipantName(myId);
-    final lastMsg = conv.lastMessage;
-    final snippet = lastMsg?.content ?? '';
-    final timeStr = lastMsg != null ? _formatTime(lastMsg.createdAt) : '';
-    final isSitting = conv.type == 'SITTING';
+    final avatar  = conv.otherParticipantAvatar(myId);
+    final snippet = conv.lastMessage?.content ?? '';
+    final timeStr = conv.lastMessage != null
+        ? _formatTime(conv.lastMessage!.createdAt)
+        : '';
+    final label   = _typeLabel(conv.type);
 
     return GestureDetector(
       onTap: () => Navigator.push(
@@ -232,110 +323,142 @@ class _ChatListScreenState extends State<ChatListScreen> {
           builder: (_) => ChatScreen(
             conversationId: conv.id,
             recipientName: name,
+            recipientImage: avatar,
+            recipientId: conv.otherParticipantId(_myUserId ?? ''),
           ),
         ),
       ).then((_) => _load()),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              color: Colors.grey.withAlpha(50),
+              spreadRadius: 1,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Row(
           children: [
-            Container(
-              width: 54, height: 54,
-              decoration: BoxDecoration(
-                  color: _pink, borderRadius: BorderRadius.circular(18)),
-              alignment: Alignment.center,
-              child: Text(
-                name.isNotEmpty ? name[0].toUpperCase() : '?',
-                style: GoogleFonts.plusJakartaSans(
-                    fontSize: 22, fontWeight: FontWeight.w800, color: _coral),
+            // ── Avatar ────────────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  width: 94,
+                  height: 94,
+                  color: const Color(0xFFFFB5B5),
+                  child: avatar != null && avatar.isNotEmpty
+                      ? Image.network(
+                          avatar,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) => Center(
+                            child: Text(
+                              name.isNotEmpty ? name[0].toUpperCase() : '?',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 36,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        )
+                      : Center(
+                          child: Text(
+                            name.isNotEmpty ? name[0].toUpperCase() : '?',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 36,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                ),
               ),
             ),
-            const SizedBox(width: 14),
+            // ── Info ──────────────────────────────────────────────────
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(name,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            name,
                             style: GoogleFonts.plusJakartaSans(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w700,
-                                color: _darkText),
-                            overflow: TextOverflow.ellipsis),
-                      ),
-                      if (timeStr.isNotEmpty)
-                        Text(timeStr,
-                            style: GoogleFonts.plusJakartaSans(
-                                fontSize: 11, color: _greyText)),
-                    ],
-                  ),
-                  const SizedBox(height: 5),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          snippet.isEmpty ? 'No messages yet' : snippet,
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 13,
-                            color: snippet.isEmpty
-                                ? const Color(0xFFCCCCCC)
-                                : _greyText,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: isSitting
-                              ? const Color(0xFFEAF2FF)
-                              : const Color(0xFFFFF0F0),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          isSitting ? 'Sitting' : 'Match',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: isSitting
-                                ? const Color(0xFF5B9EF7)
-                                : _coral,
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        if (timeStr.isNotEmpty)
+                          Text(
+                            timeStr,
+                            style: GoogleFonts.plusJakartaSans(
+                                fontSize: 11, color: _greyText),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    _pill(
+                      icon: Icons.chat_bubble_outline_rounded,
+                      label: snippet.isEmpty ? 'No messages yet' : snippet,
+                    ),
+                    const SizedBox(height: 4),
+                    _pill(
+                      icon: Icons.label_outline_rounded,
+                      label: label,
+                      color: _coral,
+                    ),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(width: 6),
-            const Icon(Icons.chevron_right_rounded,
-                color: Color(0xFFDDDDDD), size: 22),
+            const Padding(
+              padding: EdgeInsets.only(right: 12),
+              child: Icon(Icons.chevron_right_rounded,
+                  color: Color(0xFFDDDDDD), size: 22),
+            ),
           ],
         ),
       ),
     );
   }
 
+  Widget _pill({required IconData icon, required String label, Color? color}) {
+    final c = color ?? _greyText;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 13, color: c),
+        const SizedBox(width: 3),
+        Flexible(
+          child: Text(
+            label,
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12,
+              color: c,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   String _formatTime(DateTime t) {
-    final now = DateTime.now();
+    final now  = DateTime.now();
     final diff = now.difference(t);
     if (diff.inDays == 0) {
       return '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';

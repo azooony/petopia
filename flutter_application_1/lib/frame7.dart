@@ -282,7 +282,7 @@ class _Frame7State extends State<Frame7> {
 
                     // Age + Gender side by side
                     Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Expanded(
                           child: _buildInputField(
@@ -491,22 +491,11 @@ class _Frame7State extends State<Frame7> {
   }
 
   Widget _buildGenderSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        Text('Gender',
-            style: GoogleFonts.plusJakartaSans(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xFF9E9E9E))),
-        const SizedBox(height: 6),
-        Row(
-          children: [
-            Expanded(child: _genderOption('MALE', 'Male')),
-            const SizedBox(width: 8),
-            Expanded(child: _genderOption('FEMALE', 'Female')),
-          ],
-        ),
+        Expanded(child: _genderOption('MALE', 'Male')),
+        const SizedBox(width: 8),
+        Expanded(child: _genderOption('FEMALE', 'Female')),
       ],
     );
   }
@@ -517,7 +506,7 @@ class _Frame7State extends State<Frame7> {
       onTap: () => setState(() => _selectedGender = value),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        height: 46,
+        height: 56,
         decoration: BoxDecoration(
           color: selected ? const Color(0xFFFFF0F0) : Colors.white,
           border: Border.all(

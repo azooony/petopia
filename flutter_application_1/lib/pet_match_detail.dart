@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'models/pet_match_models.dart';
 import 'chat_screen.dart';
 import 'services/chat_service.dart';
+import 'services/auth_storage.dart';
 
 class PetMatchDetail extends StatelessWidget {
   final MatchPet match;
@@ -60,6 +61,8 @@ class PetMatchDetail extends StatelessWidget {
         targetUserId: match.ownerId,
         context: 'MATCHING',
       );
+      final myId = ChatService.currentUserId ?? await AuthStorage.getUserId() ?? '';
+      final recipientAvatar = conv.otherParticipantAvatar(myId);
       if (!context.mounted) return;
       Navigator.push(
         context,
@@ -67,7 +70,7 @@ class PetMatchDetail extends StatelessWidget {
           builder: (_) => ChatScreen(
             conversationId: conv.id,
             recipientName:  match.ownerName,
-            recipientImage: match.imageUrl,
+            recipientImage: recipientAvatar,
           ),
         ),
       );

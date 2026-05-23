@@ -56,3 +56,9 @@ export const uploadLostFound = multer({
   fileFilter: imageFilter,
   limits,
 });
+
+export const uploadAvatar = multer({
+  storage: makeStorage("uploads/avatars/"),
+  fileFilter: imageFilter,
+  limits,
+});

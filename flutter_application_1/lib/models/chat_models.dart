@@ -49,8 +49,13 @@ class ChatMessage {
 class ConversationParticipant {
   final String userId;
   final String fullName;
+  final String? profilePicture;
 
-  const ConversationParticipant({required this.userId, required this.fullName});
+  const ConversationParticipant({
+    required this.userId,
+    required this.fullName,
+    this.profilePicture,
+  });
 
   factory ConversationParticipant.fromJson(Map<String, dynamic> j) {
     final userRaw = j['user'];
@@ -58,6 +63,7 @@ class ConversationParticipant {
     return ConversationParticipant(
       userId: j['userId'] as String? ?? '',
       fullName: user['fullName'] as String? ?? '',
+      profilePicture: user['profilePicture'] as String?,
     );
   }
 }
@@ -106,5 +112,19 @@ class Conversation {
       if (p.userId != myUserId) return p.fullName;
     }
     return participants.isNotEmpty ? participants.first.fullName : 'Unknown';
+  }
+
+  String otherParticipantId(String myUserId) {
+    for (final p in participants) {
+      if (p.userId != myUserId) return p.userId;
+    }
+    return participants.isNotEmpty ? participants.first.userId : '';
+  }
+
+  String? otherParticipantAvatar(String myUserId) {
+    for (final p in participants) {
+      if (p.userId != myUserId) return p.profilePicture;
+    }
+    return participants.isNotEmpty ? participants.first.profilePicture : null;
   }
 }

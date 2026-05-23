@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'frame_lostfound_intro.dart';
+import 'frame5.dart';
 
-
-class Frame4 extends StatelessWidget {
-  const Frame4({super.key});
+class FrameLostFoundIntro extends StatelessWidget {
+  const FrameLostFoundIntro({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,50 +23,7 @@ class Frame4 extends StatelessWidget {
                 ),
                 child: Stack(
                   children: [
-                    Positioned(
-                      left: 34,
-                      top: 518,
-                      child: SizedBox(
-                        width: 305.38,
-                        height: 91.75,
-                        child: Text.rich(
-                          TextSpan(
-                            children: [
-                              TextSpan(
-                                text: 'Access ',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 23,
-                                  
-                                  fontWeight: FontWeight.w700,
-                                  height: 1.30,
-                                ),
-                              ),
-                              TextSpan(
-                                text: 'Educational Resources',
-                                style: TextStyle(
-                                  color: Color(0xFFED6663),
-                                  fontSize: 23,
-                                  
-                                  fontWeight: FontWeight.w700,
-                                  height: 1.30,
-                                ),
-                              ),
-                              TextSpan(
-                                text: ' for Pet Behavior and Training',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 23,
-                                  
-                                  fontWeight: FontWeight.w700,
-                                  height: 1.30,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+                    // ── Petopia header image (same as all other frames) ─────
                     Positioned(
                       left: 8.03,
                       top: 87.39,
@@ -82,7 +38,85 @@ class Frame4 extends StatelessWidget {
                         ),
                       ),
                     ),
-                    
+
+                    // ── Illustration ────────────────────────────────────────
+                    Positioned(
+                      left: 80,
+                      top: 200,
+                      child: Container(
+                        width: 220,
+                        height: 270,
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage("assets/images/lost.png"),
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // ── Headline text ───────────────────────────────────────
+                    Positioned(
+                      left: 34,
+                      top: 518,
+                      child: SizedBox(
+                        width: 305.38,
+                        height: 91.75,
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Reunite with Your ',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 23,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.30,
+                                ),
+                              ),
+                              TextSpan(
+                                text: 'Lost Pet',
+                                style: TextStyle(
+                                  color: Color(0xFFED6663),
+                                  fontSize: 23,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.30,
+                                ),
+                              ),
+                              TextSpan(
+                                text: ' or Help a ',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 23,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.30,
+                                ),
+                              ),
+                              TextSpan(
+                                text: 'Found One',
+                                style: TextStyle(
+                                  color: Color(0xFFED6663),
+                                  fontSize: 23,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.30,
+                                ),
+                              ),
+                              TextSpan(
+                                text: ' Get Home',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 23,
+                                  fontWeight: FontWeight.w700,
+                                  height: 1.30,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // ── Get Started button ──────────────────────────────────
                     Positioned(
                       left: 91,
                       top: 652,
@@ -92,7 +126,8 @@ class Frame4 extends StatelessWidget {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const FrameLostFoundIntro()),
+                              MaterialPageRoute(
+                                  builder: (context) => const Frame5()),
                             );
                           },
                           borderRadius: BorderRadius.circular(20),
@@ -103,13 +138,12 @@ class Frame4 extends StatelessWidget {
                               color: const Color(0xFFFF7578),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: Center(
+                            child: const Center(
                               child: Text(
-                                'Get Started',
+                                'Get started',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 20,
-                                  
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -118,20 +152,8 @@ class Frame4 extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Positioned(
-                      left: 93.95,
-                      top: 210,
-                      child: Container(
-                        width: 194.06,
-                        height: 247.48,
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage("assets/images/dog.png"),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                    ),
+
+                    // ── Dot indicators (4 dots, 4th active) ────────────────
                     Positioned(
                       left: 153,
                       top: 755.66,
@@ -164,10 +186,10 @@ class Frame4 extends StatelessWidget {
                       left: 177,
                       top: 755.66,
                       child: Container(
-                        width: 17.06,
-                        height: 7.44,
+                        width: 7.06,
+                        height: 7.36,
                         decoration: ShapeDecoration(
-                          color: const Color(0xFFFF9DA0),
+                          color: const Color(0xFFDFDFDF),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.35),
                           ),
@@ -175,13 +197,13 @@ class Frame4 extends StatelessWidget {
                       ),
                     ),
                     Positioned(
-                      left: 199,
+                      left: 189,
                       top: 755.66,
                       child: Container(
-                        width: 7.06,
-                        height: 7.36,
+                        width: 17.06,
+                        height: 7.44,
                         decoration: ShapeDecoration(
-                          color: const Color(0xFFEFD2D3),
+                          color: const Color(0xFFFF9DA0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.35),
                           ),

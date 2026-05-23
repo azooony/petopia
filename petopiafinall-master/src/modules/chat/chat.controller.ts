@@ -53,6 +53,20 @@ export class ChatController {
     }
   };
 
+  // DELETE /chat/conversations/:conversationId
+  static deleteConversation = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    try {
+      const conversationId = req.params['conversationId'] as string;
+      if (!conversationId) {
+        return next(new AppError("conversationId is required.", HttpCode.BAD_REQUEST));
+      }
+      await ChatService.deleteConversation(req.user!.userId, conversationId);
+      res.status(200).json({ success: true, message: "Conversation deleted.", data: null, error: null });
+    } catch (err) {
+      next(err);
+    }
+  };
+
   // GET /chat/conversations/:conversationId/messages
   static getMessages = async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {

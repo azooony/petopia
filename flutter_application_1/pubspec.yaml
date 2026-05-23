@@ -90,6 +90,7 @@ flutter:
     - assets/images/chat_grey.png
     - assets/images/pet_walking.png
     - assets/images/profile_icon_.png
+    - assets/images/lost.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

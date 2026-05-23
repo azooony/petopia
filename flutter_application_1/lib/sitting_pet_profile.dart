@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'sitting_data.dart';
 import 'chat_screen.dart';
 import 'services/chat_service.dart';
+import 'services/auth_storage.dart';
 
 class SittingPetProfile extends StatelessWidget {
   final SittingPet pet;
@@ -289,6 +290,8 @@ class SittingPetProfile extends StatelessWidget {
         targetUserId: pet.ownerId,
         context: 'SITTING',
       );
+      final myId = ChatService.currentUserId ?? await AuthStorage.getUserId() ?? '';
+      final recipientAvatar = conv.otherParticipantAvatar(myId);
       if (!context.mounted) return;
       Navigator.push(
         context,
@@ -296,7 +299,7 @@ class SittingPetProfile extends StatelessWidget {
           builder: (_) => ChatScreen(
             conversationId: conv.id,
             recipientName:  pet.ownerName,
-            recipientImage: pet.imageUrl,
+            recipientImage: recipientAvatar,
           ),
         ),
       );

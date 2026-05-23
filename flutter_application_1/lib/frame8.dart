@@ -10,10 +10,11 @@ import 'frame6.dart';
 import 'services/auth_storage.dart';
 import 'services/chat_service.dart';
 import 'chat_list_screen.dart';
+import 'lost_found_selection.dart';
 
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// Frame8 â€“ Home screen  (Figma design: Plus Jakarta Sans, coral #FF7578 palette)
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─────────────────────────────────────────────────────────────────────────────
+// Frame8 – Home screen  (Figma design: Plus Jakarta Sans, coral #FF7578 palette)
+// ─────────────────────────────────────────────────────────────────────────────
 
 class Frame8 extends StatefulWidget {
   const Frame8({super.key});
@@ -28,14 +29,14 @@ class _Frame8State extends State<Frame8> {
   // Which bottom-nav item is active
   int _currentIndex = 0;
 
-  // â”€â”€ Colours (straight from Figma) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Colours (straight from Figma) ──────────────────────────────────────────
   static const _pink = Color(0xFFFFC7C8); // banner / card background
   static const _coral = Color(0xFFFF7578); // active chip, button, home dot
   static const _bgPage = Color(0xFFF6F6F6); // page background
   static const _textDark = Color(0xFF333333); // section labels
   static const _textGrey = Color(0xFF777777); // secondary / card labels
 
-  // â”€â”€ Navigation helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Navigation helper ──────────────────────────────────────────────────────
   void _handleSearchResult(Map<String, dynamic> result) {
     if (!mounted) return;
     if (result['type'] == 'vet') {
@@ -52,6 +53,21 @@ class _Frame8State extends State<Frame8> {
     if (index == 1) {
       Navigator.push(
           context, MaterialPageRoute(builder: (_) => const ChatListScreen()));
+      return;
+    }
+    if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => LostFoundSelection(
+            typeFilter: _selectedCategory == 'Dogs'
+                ? 'DOG'
+                : _selectedCategory == 'Cats'
+                    ? 'CAT'
+                    : null,
+          ),
+        ),
+      );
       return;
     }
     setState(() => _currentIndex = index);
@@ -92,7 +108,7 @@ class _Frame8State extends State<Frame8> {
     );
   }
 
-  // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ─────────────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -149,7 +165,7 @@ class _Frame8State extends State<Frame8> {
     );
   }
 
-  // â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Header ──────────────────────────────────────────────────────────────────
   Widget _buildHeader() {
     return Padding(
       padding: const EdgeInsets.only(top: 0),
@@ -202,7 +218,7 @@ class _Frame8State extends State<Frame8> {
     );
   }
 
-  // â”€â”€ Search bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Search bar ──────────────────────────────────────────────────────────────
   Widget _buildSearchBar() {
     return GestureDetector(
       onTap: () {
@@ -240,7 +256,7 @@ class _Frame8State extends State<Frame8> {
     );
   }
 
-  // â”€â”€ Pet-needs banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Pet-needs banner ──────────────────────────────────────────────────────
   Widget _buildBanner() {
     return Container(
       width: double.infinity,
@@ -329,7 +345,7 @@ class _Frame8State extends State<Frame8> {
     );
   }
 
-  // â”€â”€ Section label helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Section label helper ──────────────────────────────────────────────────
   Widget _sectionLabel(String text) {
     return Padding(
       padding: EdgeInsets.zero,
@@ -338,14 +354,13 @@ class _Frame8State extends State<Frame8> {
         style: const TextStyle(
           color: _textDark,
           fontSize: 20,
-
           fontWeight: FontWeight.w500,
         ),
       ),
     );
   }
 
-  // â”€â”€ Category chips row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Category chips row ──────────────────────────────────────────────────
   Widget _buildCategoryRow() {
     final cats = [
       {'label': 'Dogs', 'image': 'assets/images/dogo.png'},
@@ -420,7 +435,7 @@ class _Frame8State extends State<Frame8> {
     );
   }
 
-  // â”€â”€ Services row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Services row ──────────────────────────────────────────────────────────
   Widget _buildServicesRow() {
     return SizedBox(
       height: 260,
@@ -539,7 +554,7 @@ class _Frame8State extends State<Frame8> {
     );
   }
 
-  // â”€â”€ Bottom navigation bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // ── Bottom navigation bar ──────────────────────────────────────────────────
   Widget _buildBottomNav() {
     return Container(
       height: 75,

@@ -29,6 +29,16 @@ export class ChatService {
     return ChatRepository.getConversations(userId);
   }
 
+  // ── Delete conversation (caller must be a participant) ────────────────────
+
+  static async deleteConversation(userId: string, conversationId: string) {
+    const isMember = await ChatRepository.isParticipant(conversationId, userId);
+    if (!isMember) {
+      throw new AppError("You are not a participant of this conversation.", HttpCode.FORBIDDEN);
+    }
+    return ChatRepository.deleteConversation(conversationId);
+  }
+
   // ── Messages (caller must be a participant) ────────────────────────────────
 
   static async getMessages(

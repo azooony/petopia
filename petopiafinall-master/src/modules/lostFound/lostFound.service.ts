@@ -3,7 +3,15 @@ import { AppError, HttpCode } from "../../common/errors/AppError";
 import { VisionClient } from "../../integrations/vision/VisionClient";
 import { LostFoundRepository } from "./lostFound.repository";
 import { ReportLostPetInput, ReportFoundPetInput } from "./lostFound.dto";
-import { PetType, Gender } from "../../../generated/prisma";
+import {
+  PetType,
+  Gender,
+  LostFoundStatus,
+  AppointmentStatus,
+  SittingBookingStatus,
+  ConversationType,
+  MatchRequestStatus,
+} from "../../../generated/prisma";
 
 export class LostFoundService {
   // ── Lost ───────────────────────────────────────────────────────────────────
@@ -14,6 +22,17 @@ export class LostFoundService {
     imageBuffers: { buffer: Buffer; filename: string }[],
     baseUrl: string,
   ) {
+    // One active lost report per user
+    const existing = await prisma.lostFoundReport.findFirst({
+      where: { ownerId: userId, status: LostFoundStatus.LOST },
+    });
+    if (existing) {
+      throw new AppError(
+        "You already have an active lost pet report. You cannot add another one.",
+        HttpCode.BAD_REQUEST,
+      );
+    }
+
     let name    = input.name;
     let breed   = input.breed;
     let gender  = input.gender as Gender | undefined;
@@ -44,7 +63,7 @@ export class LostFoundService {
       ({ filename }) => `${baseUrl}/uploads/lost-found/${filename}`,
     );
 
-    return LostFoundRepository.createLostReport({
+    const report = await LostFoundRepository.createLostReport({
       ownerId:          userId,
       species:          input.species as PetType,
       description:      input.description,
@@ -55,6 +74,121 @@ export class LostFoundService {
       ...(gender !== undefined && { gender }),
       ...(input.color !== undefined && { color: input.color }),
       imageUrls,
+    });
+
+    if (input.petId) {
+      try {
+        await LostFoundService.cleanupAfterLostReport(userId, input.petId);
+      } catch {
+        // cleanup failure must not fail the report submission
+      }
+    }
+
+    return report;
+  }
+
+  private static async cleanupAfterLostReport(ownerId: string, petId: string) {
+    // 1. Remove from pet matching — delete profile and cancel pending requests
+    await prisma.petMatchProfile.deleteMany({ where: { petId } });
+    await prisma.petMatchRequest.updateMany({
+      where: {
+        OR: [{ fromPetId: petId }, { toPetId: petId }],
+        status: MatchRequestStatus.PENDING,
+      },
+      data: { status: MatchRequestStatus.CANCELLED },
+    });
+
+    // 2. Remove from sitting availability
+    await prisma.pet.update({
+      where: { id: petId },
+      data: { isAvailableForSitting: false, payRatePerDay: null, sittingNotes: null },
+    });
+
+    // 3. Cancel active sitting bookings and notify each sitter
+    const sittingBookings = await prisma.sittingBooking.findMany({
+      where: {
+        petId,
+        status: { in: [SittingBookingStatus.PENDING, SittingBookingStatus.ACCEPTED] },
+      },
+      include: { pet: { select: { name: true } } },
+    });
+    if (sittingBookings.length > 0) {
+      await prisma.sittingBooking.updateMany({
+        where: {
+          petId,
+          status: { in: [SittingBookingStatus.PENDING, SittingBookingStatus.ACCEPTED] },
+        },
+        data: { status: SittingBookingStatus.CANCELLED },
+      });
+      for (const booking of sittingBookings) {
+        const petName = (booking as any).pet?.name ?? "the pet";
+        await LostFoundService.sendSystemMessage(
+          ownerId,
+          booking.sitterId,
+          `The sitting booking for ${petName} has been cancelled because the pet has been reported as lost.`,
+        ).catch(() => {});
+      }
+    }
+
+    // 4. Cancel pending/confirmed appointments and notify each vet
+    const appointments = await prisma.appointment.findMany({
+      where: {
+        petId,
+        status: { in: [AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED] },
+      },
+      include: { pet: { select: { name: true } } },
+    });
+    if (appointments.length > 0) {
+      await prisma.appointment.updateMany({
+        where: {
+          petId,
+          status: { in: [AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED] },
+        },
+        data: { status: AppointmentStatus.CANCELLED },
+      });
+      for (const appt of appointments) {
+        const petName = (appt as any).pet?.name ?? "the pet";
+        const date = appt.startTime.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric",
+        });
+        await LostFoundService.sendSystemMessage(
+          ownerId,
+          appt.vetId,
+          `The appointment for ${petName} scheduled on ${date} has been cancelled. Reason: the pet has been reported as lost.`,
+        ).catch(() => {});
+      }
+    }
+  }
+
+  private static async sendSystemMessage(
+    fromUserId: string,
+    toUserId: string,
+    content: string,
+  ) {
+    let conversation = await prisma.conversation.findFirst({
+      where: {
+        AND: [
+          { participants: { some: { userId: fromUserId } } },
+          { participants: { some: { userId: toUserId } } },
+        ],
+      },
+    });
+
+    if (!conversation) {
+      conversation = await prisma.conversation.create({
+        data: {
+          type: ConversationType.MATCHING,
+          participants: {
+            create: [{ userId: fromUserId }, { userId: toUserId }],
+          },
+        },
+      });
+    }
+
+    await prisma.chatMessage.create({
+      data: { conversationId: conversation.id, senderId: fromUserId, content },
     });
   }
 
@@ -106,5 +240,15 @@ export class LostFoundService {
 
   static async getFoundReports() {
     return LostFoundRepository.getFoundReports();
+  }
+
+  static async deleteFoundReport(userId: string, reportId: string) {
+    const result = await LostFoundRepository.deleteFoundReport(reportId, userId);
+    if (result.count === 0) {
+      throw new AppError(
+        "Report not found or you do not have permission to delete it.",
+        HttpCode.NOT_FOUND,
+      );
+    }
   }
 }
