@@ -3,6 +3,9 @@ import { createServer } from "http";
 import type { Express } from "express";
 import { verifyToken } from "./common/utils/jwt";
 import { ChatRepository } from "./modules/chat/chat.repository";
+import { NotificationGateway } from "./modules/Notification/notification.socket";
+import { fireNotification } from "./modules/Notification/notification.helpers";
+import { notifyNewChatMessage } from "./modules/Notification/notification.templates";
 
 console.log("=== socket.ts LOADED — new version with full logging ===");
 
@@ -53,6 +56,8 @@ export function initSocket(httpServer: HttpServer): SocketServer {
       next(new Error("Unauthorized: invalid or expired token"));
     }
   });
+
+  NotificationGateway.initialize(io);
 
   // ── Connection handler ────────────────────────────────────────────────────
   io.on("connection", async (socket: Socket) => {
@@ -170,6 +175,16 @@ export function initSocket(httpServer: HttpServer): SocketServer {
         }
         emitter.emit("receive_message", msgPayload);
         console.log(`[socket] send_message broadcast to ${participantIds.length} participant(s)`);
+
+        const senderName =
+          (message.sender as { fullName?: string } | null)?.fullName ?? "Someone";
+        for (const pid of participantIds) {
+          if (pid !== userId) {
+            fireNotification(
+              notifyNewChatMessage(pid, conversationId, senderName),
+            );
+          }
+        }
       } catch (err) {
         console.error(`[socket] send_message ERROR for user ${userId}:`, err);
         socket.emit("error", { message: "Failed to send message" });

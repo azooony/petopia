@@ -12,6 +12,12 @@ import {
   ConversationType,
   MatchRequestStatus,
 } from "../../../generated/prisma";
+import { fireNotification } from "../Notification/notification.helpers";
+import {
+  notifyLostPetReported,
+  notifySittingBookingCancelled,
+  notifyAppointmentCancelled,
+} from "../Notification/notification.templates";
 
 export class LostFoundService {
   // ── Lost ───────────────────────────────────────────────────────────────────
@@ -76,6 +82,10 @@ export class LostFoundService {
       imageUrls,
     });
 
+    fireNotification(
+      notifyLostPetReported(userId, report.id, name ?? undefined),
+    );
+
     if (input.petId) {
       try {
         await LostFoundService.cleanupAfterLostReport(userId, input.petId);
@@ -121,12 +131,16 @@ export class LostFoundService {
         data: { status: SittingBookingStatus.CANCELLED },
       });
       for (const booking of sittingBookings) {
-        const petName = (booking as any).pet?.name ?? "the pet";
+        const petName = (booking as { pet?: { name?: string } }).pet?.name ?? "the pet";
+        const reason = `The sitting booking for ${petName} was cancelled because the pet was reported as lost.`;
         await LostFoundService.sendSystemMessage(
           ownerId,
           booking.sitterId,
-          `The sitting booking for ${petName} has been cancelled because the pet has been reported as lost.`,
+          reason,
         ).catch(() => {});
+        fireNotification(
+          notifySittingBookingCancelled(booking.sitterId, booking.id, reason),
+        );
       }
     }
 
@@ -147,17 +161,21 @@ export class LostFoundService {
         data: { status: AppointmentStatus.CANCELLED },
       });
       for (const appt of appointments) {
-        const petName = (appt as any).pet?.name ?? "the pet";
+        const petName = (appt as { pet?: { name?: string } }).pet?.name ?? "the pet";
         const date = appt.startTime.toLocaleDateString("en-GB", {
           day: "2-digit",
           month: "long",
           year: "numeric",
         });
+        const reason = `The appointment for ${petName} on ${date} was cancelled because the pet was reported as lost.`;
         await LostFoundService.sendSystemMessage(
           ownerId,
           appt.vetId,
-          `The appointment for ${petName} scheduled on ${date} has been cancelled. Reason: the pet has been reported as lost.`,
+          reason,
         ).catch(() => {});
+        fireNotification(
+          notifyAppointmentCancelled(appt.vetId, appt.id, reason),
+        );
       }
     }
   }

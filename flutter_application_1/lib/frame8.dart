@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'maylo.dart';
+import 'banner_rotation.dart';
+import 'banner_content.dart';
+import 'main.dart' show appRouteObserver;
 import 'vetappointmnets.dart';
 import 'user_profile.dart';
 import 'petmatching.dart';
@@ -24,11 +26,50 @@ class Frame8 extends StatefulWidget {
   State<Frame8> createState() => _Frame8State();
 }
 
-class _Frame8State extends State<Frame8> {
+class _Frame8State extends State<Frame8> with RouteAware {
   // Which category chip is active (null = no filter)
   String? _selectedCategory;
   // Which bottom-nav item is active
   int _currentIndex = 0;
+  // Currently displayed banner image path
+  String _currentBannerImage = '';
+  // True while case-8 async sitter-status check is in flight
+  bool _bannerLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    BannerRotation.advanceBannerIndex();
+    _currentBannerImage = BannerRotation.advance(null);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        precacheImage(AssetImage(BannerRotation.peek(null)), context);
+      }
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route != null) appRouteObserver.subscribe(this, route);
+  }
+
+  @override
+  void dispose() {
+    appRouteObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  // Called when user navigates back to this screen from a pushed route.
+  @override
+  void didPopNext() {
+    if (!mounted) return;
+    BannerRotation.advanceBannerIndex();
+    final next = BannerRotation.advance(_selectedCategory);
+    precacheImage(AssetImage(BannerRotation.peek(_selectedCategory)), context);
+    setState(() => _currentBannerImage = next);
+  }
 
   // ── Colours (straight from Figma) ──────────────────────────────────────────
   static const _pink = Color(0xFFFFC7C8); // banner / card background
@@ -46,7 +87,13 @@ class _Frame8State extends State<Frame8> {
         MaterialPageRoute(builder: (_) => const VetAppointments()),
       );
     } else if (result['type'] == 'category') {
-      setState(() => _selectedCategory = result['name'] as String);
+      final newCat = result['name'] as String;
+      final next = BannerRotation.advance(newCat);
+      precacheImage(AssetImage(BannerRotation.peek(newCat)), context);
+      setState(() {
+        _selectedCategory = newCat;
+        _currentBannerImage = next;
+      });
     }
   }
 
@@ -262,6 +309,8 @@ class _Frame8State extends State<Frame8> {
 
   // ── Pet-needs banner ──────────────────────────────────────────────────────
   Widget _buildBanner() {
+    final banner = BannerContent.items[BannerRotation.bannerIndex];
+
     return Container(
       width: double.infinity,
       height: 160,
@@ -271,31 +320,17 @@ class _Frame8State extends State<Frame8> {
       ),
       child: Stack(
         children: [
-          // Background oval for the dog
-          Positioned(
-            right: 0,
-            bottom: 10,
-            child: Container(
-              width: 160,
-              height: 70,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFB6B7),
-                borderRadius: const BorderRadius.all(
-                  Radius.elliptical(160, 70),
-                ),
-              ),
-            ),
-          ),
-          // Text + button column
+          // Text + button column — right:155 reserves space for the pet image
+          // and prevents text from overflowing into the image zone.
           Positioned(
             left: 25,
+            right: 155,
             top: 25,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Banner headline
                 Text(
-                  'Pets needs\nsitting',
+                  banner.text,
                   style: GoogleFonts.plusJakartaSans(
                     color: const Color(0xFF5A5A5A),
                     fontSize: 20,
@@ -303,45 +338,85 @@ class _Frame8State extends State<Frame8> {
                     height: 1.1,
                   ),
                 ),
-                const SizedBox(height: 15),
-                // "petsit now" button
+                const SizedBox(height: 12),
                 GestureDetector(
-                  onTap:
-                      () => Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const MayloProfile()),
-                      ),
+                  onTap: _bannerLoading
+                      ? null
+                      : () async {
+                          setState(() => _bannerLoading = true);
+                          try {
+                            await banner.onTap(context, _selectedCategory);
+                          } finally {
+                            if (mounted) {
+                              setState(() => _bannerLoading = false);
+                            }
+                          }
+                        },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 30,
-                      vertical: 12,
+                      horizontal: 18,
+                      vertical: 10,
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    child: const Text(
-                      'petsit now',
-                      style: TextStyle(
-                        color: _coral,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child: _bannerLoading
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: _coral,
+                            ),
+                          )
+                        : FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              banner.buttonLabel,
+                              style: const TextStyle(
+                                color: _coral,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
                   ),
                 ),
               ],
             ),
           ),
-          // Dog image (right side)
+          // Oval + pet image centred together
           Positioned(
-            right: 10,
+            right: 4,
             bottom: 0,
-            child: Image.asset(
-              'assets/images/maylo.png',
-              width: 130,
-              height: 150,
-              fit: BoxFit.contain,
+            width: 160,
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 22),
+                  child: Container(
+                    width: 155,
+                    height: 48,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFADADD),
+                      borderRadius:
+                          BorderRadius.all(Radius.elliptical(155, 48)),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: Image.asset(
+                    _currentBannerImage,
+                    width: 130,
+                    height: 150,
+                    fit: BoxFit.contain,
+                    gaplessPlayback: true,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -384,7 +459,15 @@ class _Frame8State extends State<Frame8> {
   Widget _buildCategoryChip(String label, String imagePath) {
     final bool active = _selectedCategory == label;
     return GestureDetector(
-      onTap: () => setState(() => _selectedCategory = active ? null : label),
+      onTap: () {
+        final newCat = active ? null : label;
+        final next = BannerRotation.advance(newCat);
+        precacheImage(AssetImage(BannerRotation.peek(newCat)), context);
+        setState(() {
+          _selectedCategory = newCat;
+          _currentBannerImage = next;
+        });
+      },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),

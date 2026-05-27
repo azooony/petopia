@@ -102,7 +102,15 @@ export class AdminRepository {
   async findPaymentById(id: string) {
     return this.db.payment.findUnique({
       where: { id },
-      include: { appointment: true },
+      include: {
+        appointment: {
+          include: {
+            owner: { select: { id: true } },
+            vet: { select: { id: true } },
+            pet: { select: { name: true } },
+          },
+        },
+      },
     });
   }
 

@@ -14,6 +14,13 @@ import {
   SearchSittersInput,
   ListPetForSittingInput,
 } from "./sitting.dto";
+import { fireNotification } from "../Notification/notification.helpers";
+import {
+  notifySittingBookingRequested,
+  notifySittingBookingAccepted,
+  notifySittingBookingRejected,
+  notifySittingBookingCancelled,
+} from "../Notification/notification.templates";
 
 export class SittingService {
   // ─────────────────────────────────────────────────────────────────────────────
@@ -261,7 +268,7 @@ export class SittingService {
     // Verify pet ownership
     const pet = await prisma.pet.findUnique({
       where: { id: input.petId },
-      select: { ownerId: true },
+      select: { ownerId: true, name: true },
     });
 
     if (!pet || pet.ownerId !== userId) {
@@ -317,6 +324,14 @@ export class SittingService {
       ...(input.ownerNotes ? { ownerNotes: input.ownerNotes } : {}),
       emergencyPhone: input.emergencyPhone,
     });
+
+    fireNotification(
+      notifySittingBookingRequested(
+        sitterProfile.userId,
+        booking.id,
+        pet.name ?? undefined,
+      ),
+    );
 
     return booking;
   }
@@ -388,6 +403,10 @@ export class SittingService {
       ConversationType.SITTING,
     );
 
+    fireNotification(
+      notifySittingBookingAccepted(booking.petOwnerId, bookingId),
+    );
+
     return updated;
   }
 
@@ -420,6 +439,10 @@ export class SittingService {
       "REJECTED"
     );
 
+    fireNotification(
+      notifySittingBookingRejected(booking.petOwnerId, bookingId),
+    );
+
     return updated;
   }
 
@@ -450,6 +473,14 @@ export class SittingService {
     const updated = await SittingRepository.updateBookingStatus(
       bookingId,
       "CANCELLED"
+    );
+
+    fireNotification(
+      notifySittingBookingCancelled(
+        booking.sitterId,
+        bookingId,
+        "The pet owner cancelled the sitting booking.",
+      ),
     );
 
     return updated;

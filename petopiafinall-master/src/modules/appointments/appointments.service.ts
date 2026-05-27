@@ -6,6 +6,8 @@ import {
   ConflictError,
   appointmentsRepository,
 } from "./appointments.repository";
+import { fireNotification } from "../Notification/notification.helpers";
+import { notifyAppointmentBookedPending } from "../Notification/notification.templates";
 
 export class AppointmentsService {
   constructor(private readonly repo: AppointmentsRepository) {}
@@ -50,7 +52,7 @@ export class AppointmentsService {
     }
 
     try {
-      return await this.repo.bookAtomically({
+      const result = await this.repo.bookAtomically({
         ownerId,
         vetId: dto.vetId,
         petId: dto.petId,
@@ -67,6 +69,12 @@ export class AppointmentsService {
         invoiceMimeType: invoiceFile.mimetype,
         invoiceSizeBytes: invoiceFile.size,
       });
+
+      fireNotification(
+        notifyAppointmentBookedPending(ownerId, result.appointment.id),
+      );
+
+      return result;
     } catch (err) {
       if (err instanceof ConflictError) {
         throw new AppError(err.message, HttpCode.CONFLICT);

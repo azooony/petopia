@@ -12,3 +12,6 @@ generated/
 
 # Zip files
 *.zip
+
+# AI model
+ai-service/models/

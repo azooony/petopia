@@ -13,6 +13,11 @@ import {
   UpdateMatchProfileDto,
   SendMatchRequestDto,
 } from "./petMatching.dto";
+import { fireNotification } from "../Notification/notification.helpers";
+import {
+  notifyMatchRequestReceived,
+  notifyMatchAccepted,
+} from "../Notification/notification.templates";
 
 export class PetMatchingService {
 
@@ -222,7 +227,17 @@ export class PetMatchingService {
       );
     }
 
-    return PetMatchingRepository.createRequest(dto);
+    const request = await PetMatchingRepository.createRequest(dto);
+
+    fireNotification(
+      notifyMatchRequestReceived(
+        request.toPet.ownerId,
+        request.id,
+        request.fromPet.name ?? undefined,
+      ),
+    );
+
+    return request;
   }
 
   // INCOMING REQUESTS
@@ -256,7 +271,7 @@ export class PetMatchingService {
     userId: string,
     requestId: string
   ) {
-    await prisma.$transaction(async (tx) => {
+    const accepted = await prisma.$transaction(async (tx) => {
       const request =
         await tx.petMatchRequest.findUnique({
           where: {
@@ -303,7 +318,17 @@ export class PetMatchingService {
         request.toPet.ownerId,
         tx
       );
+
+      return request;
     });
+
+    fireNotification(
+      notifyMatchAccepted(
+        accepted.fromPet.ownerId,
+        requestId,
+        accepted.toPet.name ?? undefined,
+      ),
+    );
 
     return {
       success: true,

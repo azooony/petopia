@@ -4,6 +4,16 @@ import { AppError, HttpCode } from "@/common/errors/AppError";
 import { VerificationStatus, SitterVerificationStatus, PaymentStatus, Prisma, AppointmentStatus } from "../../../generated/prisma";
 import { AdminRepository, adminRepository } from "./admin.repository";
 import type { AdminLoginDto } from "./admin.dto";
+import { fireNotification } from "../Notification/notification.helpers";
+import {
+  notifyVetApproved,
+  notifyVetRejected,
+  notifySitterApproved,
+  notifySitterRejected,
+  notifyPaymentApproved,
+  notifyPaymentRejected,
+  notifyAppointmentConfirmedForVet,
+} from "../Notification/notification.templates";
 
 export class AdminService {
   constructor(private readonly repo: AdminRepository) {}
@@ -48,6 +58,10 @@ export class AdminService {
       entityId: vetProfileId,
     });
 
+    fireNotification(
+      notifyVetApproved(updated.user.id, vetProfileId),
+    );
+
     return updated;
   }
 
@@ -70,6 +84,10 @@ export class AdminService {
       entityType: "VetProfile",
       entityId: vetProfileId,
     });
+
+    fireNotification(
+      notifyVetRejected(profile.userId, vetProfileId),
+    );
 
     return updated;
   }
@@ -100,6 +118,10 @@ export class AdminService {
       entityId: serviceId,
     });
 
+    fireNotification(
+      notifySitterApproved(updated.user.id, serviceId),
+    );
+
     return updated;
   }
 
@@ -122,6 +144,10 @@ export class AdminService {
       entityType: "SitterProfile",
       entityId: serviceId,
     });
+
+    fireNotification(
+      notifySitterRejected(listing.userId, serviceId),
+    );
 
     return updated;
   }
@@ -164,6 +190,20 @@ export class AdminService {
       meta: { appointmentId: payment.appointmentId } satisfies Prisma.InputJsonObject,
     });
 
+    const appt = payment.appointment;
+    if (appt) {
+      fireNotification(
+        notifyPaymentApproved(appt.owner.id, paymentId, appt.id),
+      );
+      fireNotification(
+        notifyAppointmentConfirmedForVet(
+          appt.vet.id,
+          appt.id,
+          appt.pet.name ?? undefined,
+        ),
+      );
+    }
+
     return { payment: updatedPayment, appointment: updatedAppointment };
   }
 
@@ -198,6 +238,13 @@ export class AdminService {
       entityId: paymentId,
       meta: { appointmentId: payment.appointmentId } satisfies Prisma.InputJsonObject,
     });
+
+    const appt = payment.appointment;
+    if (appt) {
+      fireNotification(
+        notifyPaymentRejected(appt.owner.id, paymentId, appt.id),
+      );
+    }
 
     return { payment: updatedPayment, appointment: updatedAppointment };
   }

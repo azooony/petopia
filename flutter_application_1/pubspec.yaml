@@ -92,6 +92,20 @@ flutter:
     - assets/images/pet_walking.png
     - assets/images/profile_icon_.png
     - assets/images/lost.png
+    - assets/images/cat1HP.png
+    - assets/images/cat2HP.png
+    - assets/images/cat3HP.png
+    - assets/images/cat4HP.png
+    - assets/images/cat5HP.png
+    - assets/images/cat6HP.png
+    - assets/images/cat7HP.png
+    - assets/images/dog1HP.png
+    - assets/images/dog2HP.png
+    - assets/images/dog3HP.png
+    - assets/images/dog4HP.png
+    - assets/images/dog5HP.png
+    - assets/images/dog6HP.png
+    - assets/images/dog7HP.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
