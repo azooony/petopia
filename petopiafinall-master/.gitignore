@@ -13,5 +13,10 @@ generated/
 # Zip files
 *.zip
 
-# AI model
+# AI model files (too large for GitHub — use Git LFS or external storage)
 ai-service/models/
+ai-service/model.safetensors
+ai-service/*.safetensors
+ai-service/*.bin
+ai-service/*.pt
+ai-service/*.onnx
