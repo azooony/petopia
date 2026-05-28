@@ -221,27 +221,15 @@ class _Frame8State extends State<Frame8> with RouteAware {
     return Padding(
       padding: const EdgeInsets.only(top: 0),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          GestureDetector(
-            onTap:
-                () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const UserProfile()),
-                ),
-            child: Container(
-              width: 64,
-              height: 64,
-              decoration: const BoxDecoration(
-                color: Colors.transparent,
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Image.asset(
-                  'assets/images/profile_icon_.png',
-                  color: const Color(0xFF8D8D8D),
-                  fit: BoxFit.contain,
-                ),
-              ),
+          Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: Image.asset(
+              'assets/images/image.png',
+              width: 60,
+              height: 60,
+              fit: BoxFit.contain,
             ),
           ),
           const Spacer(),
@@ -250,8 +238,21 @@ class _Frame8State extends State<Frame8> with RouteAware {
             icon: const Icon(Icons.menu_rounded, color: Color(0xFF8D8D8D), size: 30),
             color: Colors.white,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            onSelected: (value) { if (value == 'logout') _logout(); },
+            onSelected: (value) {
+              if (value == 'logout') _logout();
+              if (value == 'profile') Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfile()));
+            },
             itemBuilder: (_) => [
+              PopupMenuItem(
+                value: 'profile',
+                child: Row(
+                  children: [
+                    const Icon(Icons.person_rounded, color: Color(0xFF8D8D8D), size: 18),
+                    const SizedBox(width: 10),
+                    Text('Profile', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600)),
+                  ],
+                ),
+              ),
               PopupMenuItem(
                 value: 'logout',
                 child: Row(
@@ -320,25 +321,26 @@ class _Frame8State extends State<Frame8> with RouteAware {
       ),
       child: Stack(
         children: [
-          // Text + button column — right:155 reserves space for the pet image
-          // and prevents text from overflowing into the image zone.
+          // Text + button — top==bottom gap, middle gap = half that.
           Positioned(
             left: 25,
             right: 155,
-            top: 25,
+            top: 0,
+            bottom: 0,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const Spacer(flex: 2),
                 Text(
                   banner.text,
                   style: GoogleFonts.plusJakartaSans(
                     color: const Color(0xFF5A5A5A),
-                    fontSize: 20,
+                    fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    height: 1.1,
+                    height: 1.2,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const Spacer(flex: 1),
                 GestureDetector(
                   onTap: _bannerLoading
                       ? null
@@ -370,25 +372,23 @@ class _Frame8State extends State<Frame8> with RouteAware {
                               color: _coral,
                             ),
                           )
-                        : FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: Text(
-                              banner.buttonLabel,
-                              style: const TextStyle(
-                                color: _coral,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
+                        : Text(
+                            banner.buttonLabel,
+                            style: const TextStyle(
+                              color: _coral,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                   ),
                 ),
+                const Spacer(flex: 2),
               ],
             ),
           ),
           // Oval + pet image centred together
           Positioned(
-            right: 4,
+            right: 20,
             bottom: 0,
             width: 160,
             child: Stack(
@@ -407,11 +407,13 @@ class _Frame8State extends State<Frame8> with RouteAware {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 14),
+                  padding: EdgeInsets.only(
+                    bottom: _currentBannerImage.contains('dog6HP') ? 30 : 14,
+                  ),
                   child: Image.asset(
                     _currentBannerImage,
-                    width: 130,
-                    height: 150,
+                    width: _currentBannerImage.contains('dog6HP') ? 105 : 130,
+                    height: _currentBannerImage.contains('dog6HP') ? 120 : 150,
                     fit: BoxFit.contain,
                     gaplessPlayback: true,
                   ),
@@ -533,6 +535,7 @@ class _Frame8State extends State<Frame8> with RouteAware {
           _buildServiceCard(
             'pet matching',
             'assets/images/cat.png',
+            imagePadding: const EdgeInsets.only(left: 38, right: 6, top: 15, bottom: 15),
             onTap: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -582,6 +585,7 @@ class _Frame8State extends State<Frame8> with RouteAware {
     String title,
     String imagePath, {
     VoidCallback? onTap,
+    EdgeInsets imagePadding = const EdgeInsets.all(15),
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -617,7 +621,7 @@ class _Frame8State extends State<Frame8> with RouteAware {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: Padding(
-                    padding: const EdgeInsets.all(15),
+                    padding: imagePadding,
                     child: Image.asset(imagePath, fit: BoxFit.contain),
                   ),
                 ),

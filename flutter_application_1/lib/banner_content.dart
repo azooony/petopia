@@ -34,7 +34,7 @@ class BannerContent {
     // ── 1. Browse found pets ──────────────────────────────────────────────────
     BannerData(
       text: 'lost your pet?\nThere\'s a chance\nit can be found!',
-      buttonLabel: 'browse found pets',
+      buttonLabel: 'click here',
       onTap: (ctx, _) async => Navigator.push(
         ctx,
         MaterialPageRoute(builder: (_) => const FoundPetListScreen()),
@@ -44,7 +44,7 @@ class BannerContent {
     // ── 2. Add a found pet ────────────────────────────────────────────────────
     BannerData(
       text: 'Found a Pet? Help\nits owner find it',
-      buttonLabel: 'add a found pet',
+      buttonLabel: 'make a report',
       onTap: (ctx, _) async => Navigator.push(
         ctx,
         MaterialPageRoute(builder: (_) => const AddFoundPetScreen()),
@@ -54,7 +54,7 @@ class BannerContent {
     // ── 3. Browse lost pets ───────────────────────────────────────────────────
     BannerData(
       text: 'Help a pet get\nback to its owner',
-      buttonLabel: 'browse lost pets',
+      buttonLabel: 'help a pet',
       onTap: (ctx, _) async => Navigator.push(
         ctx,
         MaterialPageRoute(builder: (_) => const LostPetListScreen()),
@@ -87,7 +87,7 @@ class BannerContent {
 
     // ── 6. Add pet for matching ───────────────────────────────────────────────
     BannerData(
-      text: 'Do you want to add\nyour pet for matching?',
+      text: 'Add your pet for matching now!',
       buttonLabel: 'add my pet',
       onTap: (ctx, cat) async => Navigator.push(
         ctx,
@@ -139,7 +139,7 @@ class BannerContent {
     // ── 9. Add pet for sitting ────────────────────────────────────────────────
     BannerData(
       text: 'Going out? Put your\npet up for sitting',
-      buttonLabel: 'add pet for sitting',
+      buttonLabel: 'add your pet',
       onTap: (ctx, _) async => Navigator.push(
         ctx,
         MaterialPageRoute(builder: (_) => const AddPetSittingScreen()),

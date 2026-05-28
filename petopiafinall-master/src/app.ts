@@ -15,6 +15,7 @@ import chatRoutes from "./modules/chat/chat.routes";
 import lostFoundRoutes from "./modules/lostFound/lostFound.routes";
 import aiRoutes from "./modules/ai/ai.routes";
 import notificationRoutes from "./modules/Notification/notification.routes";
+import searchRoutes from "./modules/search/search.routes";
 
 const app = express();
 
@@ -57,6 +58,7 @@ app.use("/chat", chatRoutes);
 app.use("/lost-found", lostFoundRoutes);
 app.use("/ai", aiRoutes);
 app.use("/notifications", notificationRoutes);
+app.use("/search", searchRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({
