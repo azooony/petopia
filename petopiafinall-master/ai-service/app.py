@@ -17,8 +17,7 @@ MODEL_DIR = os.path.join(os.path.dirname(__file__), 'models')
 # Oxford-IIIT Pet Dataset — 12 cat breeds (remaining 25 are dog breeds)
 _CAT_BREEDS = {
     'abyssinian', 'bengal', 'birman', 'bombay', 'british shorthair',
-    'british_shorthair', 'egyptian mau', 'egyptian_mau', 'maine coon',
-    'maine_coon', 'persian', 'ragdoll', 'russian blue', 'russian_blue',
+    'egyptian mau', 'maine coon', 'persian', 'ragdoll', 'russian blue',
     'siamese', 'sphynx',
 }
 
@@ -68,4 +67,4 @@ def classify():
 
 if __name__ == '__main__':
     _load_model()
-    app.run(host='0.0.0.0', port=5001, debug=False)
+    app.run(host='0.0.0.0', port=5001, debug=False, use_reloader=False)

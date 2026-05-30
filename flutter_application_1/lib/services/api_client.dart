@@ -182,9 +182,10 @@ class ApiClient {
         jsonDecode(response.body) as Map<String, dynamic>;
 
     if (response.statusCode == 401) {
-      // Token expired — clear local session so the app can re-login.
+      // Clear any saved session (no-op during login since nothing is stored yet).
       AuthStorage.clear();
-      throw const ApiException(401, 'Session expired. Please log in again.');
+      final msg = body['message'] as String? ?? 'Session expired. Please log in again.';
+      throw ApiException(401, msg);
     }
 
     if (response.statusCode >= 400) {

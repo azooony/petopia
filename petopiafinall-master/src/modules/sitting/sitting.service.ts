@@ -632,7 +632,7 @@ export class SittingService {
       petType: input.petType,
       payRatePerDay: input.payRatePerDay,
       sittingNotes: input.sittingNotes ?? null,
-      photo: photoUrl ?? null,
+      photo: photoUrl, // undefined when no file — repository skips the field entirely
     });
   }
 
