@@ -163,7 +163,7 @@ class _FloatingChatBubbleState extends State<FloatingChatBubble>
       height: 60,
       decoration: BoxDecoration(
         color: _coral,
-        shape: BoxShape.circle,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: _coral.withValues(alpha: 0.4),
@@ -210,10 +210,14 @@ class _FloatingChatBubbleState extends State<FloatingChatBubble>
       ),
       child: Row(
         children: [
-          const CircleAvatar(
-            radius: 18,
-            backgroundColor: Colors.white,
-            child: Icon(Icons.pets, color: _coral, size: 20),
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(Icons.pets, color: _coral, size: 20),
           ),
           const SizedBox(width: 10),
           Expanded(
