@@ -159,60 +159,60 @@ class _Frame8State extends State<Frame8> with RouteAware {
   // ─────────────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: const Color(0xFF1C2632), // dark outer frame
-      child: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 402, maxHeight: 874),
-          decoration: BoxDecoration(
-            color: _bgPage,
-            borderRadius: BorderRadius.circular(35),
+    return Scaffold(
+      backgroundColor: _bgPage,
+      body: SizedBox.expand(
+        child: FittedBox(
+          fit: BoxFit.cover,
+          alignment: Alignment.topCenter,
+          child: SizedBox(
+            width: 402,
+            height: 874,
+            child: _buildHomeLayout(),
           ),
-          clipBehavior: Clip.antiAlias,
-          child: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: Stack(
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHomeLayout() {
+    return Stack(
+      children: [
+        SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SafeArea(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    physics: const BouncingScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 10),
-                        _buildHeader(),
-                        const SizedBox(height: 20),
-                        _buildSearchBar(),
-                        const SizedBox(height: 25),
-                        _buildBanner(),
-                        const SizedBox(height: 25),
-                        _sectionLabel('categories'),
-                        const SizedBox(height: 15),
-                        _buildCategoryRow(),
-                        const SizedBox(height: 5),
-                        _sectionLabel('services'),
-                        const SizedBox(height: 15),
-                        _buildServicesRow(),
-                        const SizedBox(height: 150), // Space for bottom nav
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 12,
-                  left: 20,
-                  right: 20,
-                  child: _buildBottomNav(),
-                ),
-                const Positioned.fill(
-                  child: FloatingChatBubble(),
-                ),
+                _buildHeader(),
+                const SizedBox(height: 14),
+                _buildSearchBar(),
+                const SizedBox(height: 18),
+                _buildBanner(),
+                const SizedBox(height: 12),
+                _sectionLabel('categories'),
+                const SizedBox(height: 13),
+                _buildCategoryRow(),
+                const SizedBox(height: 8),
+                _sectionLabel('services'),
+                const SizedBox(height: 13),
+                _buildServicesRow(),
+                const SizedBox(height: 95),
               ],
             ),
           ),
         ),
-      ),
+        Positioned(
+          bottom: 12,
+          left: 20,
+          right: 20,
+          child: _buildBottomNav(),
+        ),
+        const Positioned.fill(
+          child: FloatingChatBubble(),
+        ),
+      ],
     );
   }
 
@@ -223,14 +223,11 @@ class _Frame8State extends State<Frame8> with RouteAware {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Image.asset(
-              'assets/images/image.png',
-              width: 60,
-              height: 60,
-              fit: BoxFit.contain,
-            ),
+          Image.asset(
+            'assets/images/image.png',
+            width: 60,
+            height: 60,
+            fit: BoxFit.contain,
           ),
           const Spacer(),
           // Modern Menu Icon (Three dashes)
@@ -314,7 +311,7 @@ class _Frame8State extends State<Frame8> with RouteAware {
 
     return Container(
       width: double.infinity,
-      height: 160,
+      height: 152,
       decoration: BoxDecoration(
         color: _pink,
         borderRadius: BorderRadius.circular(25),
@@ -451,7 +448,7 @@ class _Frame8State extends State<Frame8> with RouteAware {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         for (int i = 0; i < cats.length; i++) ...[
-          if (i > 0) const SizedBox(width: 15),
+          if (i > 0) const SizedBox(width: 28),
           _buildCategoryChip(cats[i]['label']!, cats[i]['image']!),
         ],
       ],
@@ -549,7 +546,7 @@ class _Frame8State extends State<Frame8> with RouteAware {
               ),
             ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 20),
           _buildServiceCard(
             'vet appointments',
             'assets/images/dr.png',
@@ -559,7 +556,7 @@ class _Frame8State extends State<Frame8> with RouteAware {
                   MaterialPageRoute(builder: (_) => const VetAppointments()),
                 ),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 20),
           _buildServiceCard(
             'pet sitting',
             'assets/images/dog.png',

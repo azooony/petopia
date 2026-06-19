@@ -74,7 +74,8 @@ export class AuthService {
       startTime?: string;
       endTime?: string;
     },
-    certificateFile: Express.Multer.File
+    certificateFile: Express.Multer.File,
+    photoFile: Express.Multer.File
   ) {
     const existing = await prisma.user.findUnique({ where: { email: data.email } });
     if (existing) throw new AppError("Email already exists", HttpCode.BAD_REQUEST);
@@ -124,6 +125,7 @@ export class AuthService {
       throw new AppError("endTime must be after startTime", HttpCode.BAD_REQUEST);
 
     const certificateImage = `/uploads/certificates/${certificateFile.filename}`;
+    const photo = `/uploads/vets/${photoFile.filename}`;
 
     const user = await prisma.user.create({
       data: {
@@ -137,6 +139,7 @@ export class AuthService {
           create: {
             phone: data.phone,
             certificateImage,
+            photo,
             clinicId: resolvedClinicId,
             yearsOfExperience,
             appointmentPrice,

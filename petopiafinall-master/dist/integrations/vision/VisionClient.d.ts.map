@@ -1,1 +1,1 @@
-{"version":3,"file":"VisionClient.d.ts","sourceRoot":"","sources":["../../../src/integrations/vision/VisionClient.ts"],"names":[],"mappings":""}
+{"version":3,"file":"VisionClient.d.ts","sourceRoot":"","sources":["../../../src/integrations/vision/VisionClient.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,iBAAiB;IAChC,MAAM,EAAE,KAAK,GAAG,KAAK,CAAC;IACtB,KAAK,EAAE,MAAM,CAAC;IACd,UAAU,EAAE,MAAM,CAAC;CACpB;AAID,qBAAa,YAAY;WACV,eAAe,CAC1B,WAAW,EAAE,MAAM,EACnB,QAAQ,SAAc,GACrB,OAAO,CAAC,iBAAiB,CAAC;CAoB9B"}

@@ -78,6 +78,7 @@ class AdminRepository {
                     include: {
                         owner: { select: { id: true, fullName: true, email: true } },
                         vet: { select: { id: true, fullName: true, email: true } },
+                        pet: { select: { name: true } },
                     },
                 },
                 proofAsset: { select: { id: true, url: true } },
@@ -88,7 +89,15 @@ class AdminRepository {
     async findPaymentById(id) {
         return this.db.payment.findUnique({
             where: { id },
-            include: { appointment: true },
+            include: {
+                appointment: {
+                    include: {
+                        owner: { select: { id: true } },
+                        vet: { select: { id: true } },
+                        pet: { select: { name: true } },
+                    },
+                },
+            },
         });
     }
     async approveAppointmentPayment(paymentId, appointmentId) {

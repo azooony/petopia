@@ -1,5 +1,5 @@
 import { SitterProfile, SitterImage, SitterAvailability, SittingBooking, SitterReview, SittingBookingStatus } from "../../../generated/prisma";
-import { SitterProfileData, SitterImageData, SitterAvailabilityData, SittingBookingData, SitterReviewData, SearchSittersFilters } from "./sitting.types";
+import { SitterProfileData, SitterImageData, SitterAvailabilityData, SittingBookingData, SitterReviewData, SearchSittersFilters, ListPetForSittingData, AvailablePetResult } from "./sitting.types";
 export declare class SittingRepository {
     static createSitterProfile(data: SitterProfileData): Promise<SitterProfile>;
     static getSitterProfileByUserId(userId: string): Promise<SitterProfile | null>;
@@ -65,6 +65,7 @@ export declare class SittingRepository {
                 city: string;
                 emergencyContact: string;
                 isAvailable: boolean;
+                venuePhotoUrl: string | null;
                 ratingAverage: number;
                 totalReviews: number;
             };
@@ -122,6 +123,7 @@ export declare class SittingRepository {
             city: string;
             emergencyContact: string;
             isAvailable: boolean;
+            venuePhotoUrl: string | null;
             ratingAverage: number;
             totalReviews: number;
         })[];
@@ -156,6 +158,7 @@ export declare class SittingRepository {
             city: string;
             emergencyContact: string;
             isAvailable: boolean;
+            venuePhotoUrl: string | null;
             ratingAverage: number;
             totalReviews: number;
         })[];
@@ -163,5 +166,40 @@ export declare class SittingRepository {
     }>;
     static approveSitterProfile(id: string): Promise<SitterProfile>;
     static rejectSitterProfile(id: string): Promise<SitterProfile>;
+    static upsertPetForSitting(userId: string, data: ListPetForSittingData): Promise<{
+        id: string;
+        age: number;
+        createdAt: Date;
+        gender: import("../../../generated/prisma").$Enums.Gender | null;
+        name: string;
+        description: string | null;
+        photo: string | null;
+        ownerId: string;
+        petOwnerProfileId: string | null;
+        breed: string | null;
+        petType: import("../../../generated/prisma").$Enums.PetType;
+        isAvailableForSitting: boolean;
+        payRatePerDay: number | null;
+        sittingNotes: string | null;
+    }>;
+    static unlistPetFromSitting(userId: string): Promise<{
+        id: string;
+        age: number;
+        createdAt: Date;
+        gender: import("../../../generated/prisma").$Enums.Gender | null;
+        name: string;
+        description: string | null;
+        photo: string | null;
+        ownerId: string;
+        petOwnerProfileId: string | null;
+        breed: string | null;
+        petType: import("../../../generated/prisma").$Enums.PetType;
+        isAvailableForSitting: boolean;
+        payRatePerDay: number | null;
+        sittingNotes: string | null;
+    } | null>;
+    static getAvailablePets(requesterId: string, petType?: string): Promise<AvailablePetResult[]>;
+    static getSitterStatus(userId: string): Promise<string | null>;
+    static createOrUpdateSitterRegistration(userId: string, idCardImageUrl: string, venuePhotoUrl: string): Promise<SitterProfile>;
 }
 //# sourceMappingURL=sitting.repository.d.ts.map

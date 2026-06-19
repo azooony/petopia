@@ -15,6 +15,12 @@ const appointments_routes_1 = __importDefault(require("./modules/appointments/ap
 const error_middleware_1 = require("./common/middlewares/error.middleware");
 const pets_routes_1 = __importDefault(require("./modules/pets/pets.routes"));
 const sitting_routes_1 = __importDefault(require("./modules/sitting/sitting.routes"));
+const petMatching_routes_1 = __importDefault(require("./modules/matching/petMatching.routes"));
+const chat_routes_1 = __importDefault(require("./modules/chat/chat.routes"));
+const lostFound_routes_1 = __importDefault(require("./modules/lostFound/lostFound.routes"));
+const ai_routes_1 = __importDefault(require("./modules/ai/ai.routes"));
+const notification_routes_1 = __importDefault(require("./modules/Notification/notification.routes"));
+const search_routes_1 = __importDefault(require("./modules/search/search.routes"));
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
     origin: (origin, callback) => {
@@ -49,6 +55,12 @@ app.use("/vets", vet_routes_1.default);
 app.use("/appointments", appointments_routes_1.default);
 app.use("/sitting", sitting_routes_1.default);
 app.use("/pets", pets_routes_1.default);
+app.use("/matching", petMatching_routes_1.default);
+app.use("/chat", chat_routes_1.default);
+app.use("/lost-found", lostFound_routes_1.default);
+app.use("/ai", ai_routes_1.default);
+app.use("/notifications", notification_routes_1.default);
+app.use("/search", search_routes_1.default);
 app.use((_req, res) => {
     res.status(404).json({
         success: false,

@@ -8,6 +8,10 @@ const prisma_1 = __importDefault(require("../../config/prisma"));
 const AppError_1 = require("../../common/errors/AppError");
 const sitting_repository_1 = require("./sitting.repository");
 const index_1 = require("../../integrations/storage/index");
+const chat_repository_1 = require("../chat/chat.repository");
+const prisma_2 = require("../../../generated/prisma");
+const notification_helpers_1 = require("../Notification/notification.helpers");
+const notification_templates_1 = require("../Notification/notification.templates");
 class SittingService {
     // ─────────────────────────────────────────────────────────────────────────────
     // Sitter Profile Operations
@@ -158,7 +162,7 @@ class SittingService {
         // Verify pet ownership
         const pet = await prisma_1.default.pet.findUnique({
             where: { id: input.petId },
-            select: { ownerId: true },
+            select: { ownerId: true, name: true },
         });
         if (!pet || pet.ownerId !== userId) {
             throw new AppError_1.AppError("Pet not found or does not belong to you", AppError_1.HttpCode.NOT_FOUND);
@@ -190,6 +194,7 @@ class SittingService {
             ...(input.ownerNotes ? { ownerNotes: input.ownerNotes } : {}),
             emergencyPhone: input.emergencyPhone,
         });
+        (0, notification_helpers_1.fireNotification)((0, notification_templates_1.notifySittingBookingRequested)(sitterProfile.userId, booking.id, pet.name ?? undefined));
         return booking;
     }
     static async getMyBookingsAsSitter(userId, page = 1, limit = 10) {
@@ -217,6 +222,9 @@ class SittingService {
             throw new AppError_1.AppError("Only pending bookings can be accepted", AppError_1.HttpCode.BAD_REQUEST);
         }
         const updated = await sitting_repository_1.SittingRepository.updateBookingStatus(bookingId, "ACCEPTED");
+        // Open a SITTING conversation between sitter and pet owner if one doesn't exist yet.
+        await chat_repository_1.ChatRepository.findOrCreateConversation(booking.sitterId, booking.petOwnerId, prisma_2.ConversationType.SITTING);
+        (0, notification_helpers_1.fireNotification)((0, notification_templates_1.notifySittingBookingAccepted)(booking.petOwnerId, bookingId));
         return updated;
     }
     static async rejectBooking(userId, bookingId) {
@@ -234,6 +242,7 @@ class SittingService {
             throw new AppError_1.AppError("Only pending bookings can be rejected", AppError_1.HttpCode.BAD_REQUEST);
         }
         const updated = await sitting_repository_1.SittingRepository.updateBookingStatus(bookingId, "REJECTED");
+        (0, notification_helpers_1.fireNotification)((0, notification_templates_1.notifySittingBookingRejected)(booking.petOwnerId, bookingId));
         return updated;
     }
     static async cancelBooking(userId, bookingId) {
@@ -251,6 +260,7 @@ class SittingService {
             throw new AppError_1.AppError("Only pending or accepted bookings can be cancelled", AppError_1.HttpCode.BAD_REQUEST);
         }
         const updated = await sitting_repository_1.SittingRepository.updateBookingStatus(bookingId, "CANCELLED");
+        (0, notification_helpers_1.fireNotification)((0, notification_templates_1.notifySittingBookingCancelled)(booking.sitterId, bookingId, "The pet owner cancelled the sitting booking."));
         return updated;
     }
     static async completeBooking(bookingId) {
@@ -324,6 +334,56 @@ class SittingService {
             throw new AppError_1.AppError("Sitter not found", AppError_1.HttpCode.NOT_FOUND);
         }
         return sitting_repository_1.SittingRepository.rejectSitterProfile(sitterId);
+    }
+    // ─────────────────────────────────────────────────────────────────────────────
+    // Pet Listing for Sitting
+    // ─────────────────────────────────────────────────────────────────────────────
+    static async listPetForSitting(userId, input, photoFile) {
+        let photoUrl;
+        if (photoFile) {
+            if (!photoFile.mimetype.startsWith("image/")) {
+                throw new AppError_1.AppError("Only image files are allowed", AppError_1.HttpCode.BAD_REQUEST);
+            }
+            const uploadResult = await index_1.storageClient.upload(photoFile.buffer, photoFile.originalname, `pet-sitting-photos/${userId}`, { mimeType: photoFile.mimetype });
+            photoUrl = uploadResult.url;
+        }
+        return sitting_repository_1.SittingRepository.upsertPetForSitting(userId, {
+            name: input.petName,
+            breed: input.breed ?? null,
+            age: input.age,
+            gender: input.gender ?? null,
+            petType: input.petType,
+            payRatePerDay: input.payRatePerDay,
+            sittingNotes: input.sittingNotes ?? null,
+            ...(photoUrl !== undefined ? { photo: photoUrl } : {}),
+        });
+    }
+    static async unlistPet(userId) {
+        const result = await sitting_repository_1.SittingRepository.unlistPetFromSitting(userId);
+        if (!result) {
+            throw new AppError_1.AppError("No pet found for this user", AppError_1.HttpCode.NOT_FOUND);
+        }
+        return result;
+    }
+    static async getAvailablePets(userId, petType) {
+        return sitting_repository_1.SittingRepository.getAvailablePets(userId, petType);
+    }
+    static async getSitterStatus(userId) {
+        const status = await sitting_repository_1.SittingRepository.getSitterStatus(userId);
+        return { status };
+    }
+    static async registerSitter(userId, nationalIdFile, venuePhotoFile) {
+        if (!nationalIdFile.mimetype.startsWith("image/")) {
+            throw new AppError_1.AppError("National ID must be an image", AppError_1.HttpCode.BAD_REQUEST);
+        }
+        if (!venuePhotoFile.mimetype.startsWith("image/")) {
+            throw new AppError_1.AppError("Venue photo must be an image", AppError_1.HttpCode.BAD_REQUEST);
+        }
+        const [nationalIdResult, venueResult] = await Promise.all([
+            index_1.storageClient.upload(nationalIdFile.buffer, nationalIdFile.originalname, `sitter-registration/${userId}/national-id`, { mimeType: nationalIdFile.mimetype }),
+            index_1.storageClient.upload(venuePhotoFile.buffer, venuePhotoFile.originalname, `sitter-registration/${userId}/venue`, { mimeType: venuePhotoFile.mimetype }),
+        ]);
+        return sitting_repository_1.SittingRepository.createOrUpdateSitterRegistration(userId, nationalIdResult.url, venueResult.url);
     }
 }
 exports.SittingService = SittingService;

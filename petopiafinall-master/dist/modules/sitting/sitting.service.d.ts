@@ -1,4 +1,4 @@
-import { CreateSitterProfileInput, UpdateSitterProfileInput, UploadSitterImageInput, AddAvailabilityInput, CreateSittingBookingInput, CreateSitterReviewInput, SearchSittersInput } from "./sitting.dto";
+import { CreateSitterProfileInput, UpdateSitterProfileInput, UploadSitterImageInput, AddAvailabilityInput, CreateSittingBookingInput, CreateSitterReviewInput, SearchSittersInput, ListPetForSittingInput } from "./sitting.dto";
 export declare class SittingService {
     static createSitterProfile(userId: string, input: CreateSitterProfileInput): Promise<{
         id: string;
@@ -14,6 +14,7 @@ export declare class SittingService {
         city: string;
         emergencyContact: string;
         isAvailable: boolean;
+        venuePhotoUrl: string | null;
         ratingAverage: number;
         totalReviews: number;
     }>;
@@ -31,6 +32,7 @@ export declare class SittingService {
         city: string;
         emergencyContact: string;
         isAvailable: boolean;
+        venuePhotoUrl: string | null;
         ratingAverage: number;
         totalReviews: number;
     }>;
@@ -48,6 +50,7 @@ export declare class SittingService {
         city: string;
         emergencyContact: string;
         isAvailable: boolean;
+        venuePhotoUrl: string | null;
         ratingAverage: number;
         totalReviews: number;
     }>;
@@ -65,6 +68,7 @@ export declare class SittingService {
         city: string;
         emergencyContact: string;
         isAvailable: boolean;
+        venuePhotoUrl: string | null;
         ratingAverage: number;
         totalReviews: number;
     }>;
@@ -203,6 +207,7 @@ export declare class SittingService {
                 city: string;
                 emergencyContact: string;
                 isAvailable: boolean;
+                venuePhotoUrl: string | null;
                 ratingAverage: number;
                 totalReviews: number;
             };
@@ -337,6 +342,7 @@ export declare class SittingService {
             city: string;
             emergencyContact: string;
             isAvailable: boolean;
+            venuePhotoUrl: string | null;
             ratingAverage: number;
             totalReviews: number;
         })[];
@@ -371,6 +377,7 @@ export declare class SittingService {
             city: string;
             emergencyContact: string;
             isAvailable: boolean;
+            venuePhotoUrl: string | null;
             ratingAverage: number;
             totalReviews: number;
         })[];
@@ -390,6 +397,7 @@ export declare class SittingService {
         city: string;
         emergencyContact: string;
         isAvailable: boolean;
+        venuePhotoUrl: string | null;
         ratingAverage: number;
         totalReviews: number;
     }>;
@@ -407,6 +415,61 @@ export declare class SittingService {
         city: string;
         emergencyContact: string;
         isAvailable: boolean;
+        venuePhotoUrl: string | null;
+        ratingAverage: number;
+        totalReviews: number;
+    }>;
+    static listPetForSitting(userId: string, input: ListPetForSittingInput, photoFile?: Express.Multer.File): Promise<{
+        id: string;
+        age: number;
+        createdAt: Date;
+        gender: import("../../../generated/prisma").$Enums.Gender | null;
+        name: string;
+        description: string | null;
+        photo: string | null;
+        ownerId: string;
+        petOwnerProfileId: string | null;
+        breed: string | null;
+        petType: import("../../../generated/prisma").$Enums.PetType;
+        isAvailableForSitting: boolean;
+        payRatePerDay: number | null;
+        sittingNotes: string | null;
+    }>;
+    static unlistPet(userId: string): Promise<{
+        id: string;
+        age: number;
+        createdAt: Date;
+        gender: import("../../../generated/prisma").$Enums.Gender | null;
+        name: string;
+        description: string | null;
+        photo: string | null;
+        ownerId: string;
+        petOwnerProfileId: string | null;
+        breed: string | null;
+        petType: import("../../../generated/prisma").$Enums.PetType;
+        isAvailableForSitting: boolean;
+        payRatePerDay: number | null;
+        sittingNotes: string | null;
+    }>;
+    static getAvailablePets(userId: string, petType?: string): Promise<import("./sitting.types").AvailablePetResult[]>;
+    static getSitterStatus(userId: string): Promise<{
+        status: string | null;
+    }>;
+    static registerSitter(userId: string, nationalIdFile: Express.Multer.File, venuePhotoFile: Express.Multer.File): Promise<{
+        id: string;
+        createdAt: Date;
+        address: string;
+        userId: string;
+        updatedAt: Date;
+        verificationStatus: import("../../../generated/prisma").$Enums.SitterVerificationStatus;
+        bio: string | null;
+        IdCardImage: string;
+        supportedPetTypes: string[];
+        maxPets: number;
+        city: string;
+        emergencyContact: string;
+        isAvailable: boolean;
+        venuePhotoUrl: string | null;
         ratingAverage: number;
         totalReviews: number;
     }>;

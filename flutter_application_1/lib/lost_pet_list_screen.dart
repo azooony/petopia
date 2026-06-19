@@ -95,10 +95,10 @@ class _LostPetListScreenState extends State<LostPetListScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFF1C2632),
+      color: Colors.white,
       child: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 375, maxHeight: 812),
+          constraints: const BoxConstraints.expand(),
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(color: Colors.grey[300]!),

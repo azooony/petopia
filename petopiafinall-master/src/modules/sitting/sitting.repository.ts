@@ -447,7 +447,6 @@ export class SittingRepository {
           },
         },
       },
-      orderBy: { createdAt: "desc" },
     });
   }
 
@@ -611,7 +610,6 @@ export class SittingRepository {
   ): Promise<AvailablePetResult[]> {
     const pets = await prisma.pet.findMany({
       where: {
-        isAvailableForSitting: true,
         ...(petType && { petType: petType as any }),
       },
       include: {

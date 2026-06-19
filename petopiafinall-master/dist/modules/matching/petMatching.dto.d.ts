@@ -20,6 +20,14 @@ export type SendMatchRequestDto = z.infer<typeof SendMatchRequestSchema>;
 export declare const FindMatchesQuerySchema: z.ZodObject<{
     page: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
     limit: z.ZodDefault<z.ZodCoercedNumber<unknown>>;
+    gender: z.ZodOptional<z.ZodEnum<{
+        MALE: "MALE";
+        FEMALE: "FEMALE";
+    }>>;
+    type: z.ZodOptional<z.ZodEnum<{
+        DOG: "DOG";
+        CAT: "CAT";
+    }>>;
 }, z.core.$strip>;
 export type FindMatchesQueryDto = z.infer<typeof FindMatchesQuerySchema>;
 //# sourceMappingURL=petMatching.dto.d.ts.map

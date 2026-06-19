@@ -5,5 +5,7 @@ export declare class UserController {
     static updateProfile: (req: AuthRequest, res: Response, next: NextFunction) => Promise<void>;
     static updatePassword: (req: AuthRequest, res: Response, next: NextFunction) => Promise<void>;
     static deleteProfile: (req: AuthRequest, res: Response, next: NextFunction) => Promise<void>;
+    static uploadAvatar: (req: AuthRequest, res: Response, next: NextFunction) => Promise<void>;
+    static blockUser: (req: AuthRequest, res: Response, next: NextFunction) => Promise<void>;
 }
 //# sourceMappingURL=user.controller.d.ts.map

@@ -361,7 +361,6 @@ class SittingRepository {
                     },
                 },
             },
-            orderBy: { createdAt: "desc" },
         });
     }
     // ─────────────────────────────────────────────────────────────────────────────
@@ -459,6 +458,106 @@ class SittingRepository {
         return prisma_1.default.sitterProfile.update({
             where: { id },
             data: { verificationStatus: prisma_2.SitterVerificationStatus.REJECTED },
+        });
+    }
+    // ─────────────────────────────────────────────────────────────────────────────
+    // Pet Listing for Sitting
+    // ─────────────────────────────────────────────────────────────────────────────
+    static async upsertPetForSitting(userId, data) {
+        return prisma_1.default.pet.upsert({
+            where: { ownerId: userId },
+            update: {
+                name: data.name,
+                breed: data.breed ?? null,
+                age: data.age,
+                gender: data.gender ?? null,
+                petType: (data.petType ?? 'DOG'),
+                isAvailableForSitting: true,
+                payRatePerDay: data.payRatePerDay,
+                sittingNotes: data.sittingNotes ?? null,
+                ...(data.photo !== undefined ? { photo: data.photo } : {}),
+            },
+            create: {
+                ownerId: userId,
+                name: data.name,
+                breed: data.breed ?? null,
+                age: data.age,
+                gender: data.gender ?? null,
+                petType: (data.petType ?? 'DOG'),
+                isAvailableForSitting: true,
+                payRatePerDay: data.payRatePerDay,
+                sittingNotes: data.sittingNotes ?? null,
+                photo: data.photo ?? null,
+            },
+        });
+    }
+    static async unlistPetFromSitting(userId) {
+        const pet = await prisma_1.default.pet.findUnique({ where: { ownerId: userId } });
+        if (!pet)
+            return null;
+        return prisma_1.default.pet.update({
+            where: { ownerId: userId },
+            data: { isAvailableForSitting: false, payRatePerDay: null, sittingNotes: null },
+        });
+    }
+    static async getAvailablePets(requesterId, petType) {
+        const pets = await prisma_1.default.pet.findMany({
+            where: {
+                ...(petType && { petType: petType }),
+            },
+            include: {
+                owner: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        ownerProfile: { select: { address: true } },
+                    },
+                },
+            },
+        });
+        return pets.map((pet) => ({
+            id: pet.id,
+            name: pet.name,
+            breed: pet.breed,
+            age: pet.age,
+            gender: pet.gender,
+            petType: pet.petType ?? 'DOG',
+            photo: pet.photo,
+            payRatePerDay: pet.payRatePerDay,
+            sittingNotes: pet.sittingNotes,
+            ownerId: pet.owner.id,
+            ownerName: pet.owner.fullName,
+            ownerAddress: pet.owner.ownerProfile?.address ?? "",
+            isOwn: pet.ownerId === requesterId,
+        }));
+    }
+    static async getSitterStatus(userId) {
+        const profile = await prisma_1.default.sitterProfile.findUnique({
+            where: { userId },
+            select: { verificationStatus: true },
+        });
+        return profile?.verificationStatus ?? null;
+    }
+    static async createOrUpdateSitterRegistration(userId, idCardImageUrl, venuePhotoUrl) {
+        return prisma_1.default.sitterProfile.upsert({
+            where: { userId },
+            update: {
+                IdCardImage: idCardImageUrl,
+                venuePhotoUrl,
+                verificationStatus: prisma_2.SitterVerificationStatus.PENDING,
+            },
+            create: {
+                userId,
+                IdCardImage: idCardImageUrl,
+                venuePhotoUrl,
+                supportedPetTypes: [],
+                maxPets: 3,
+                city: "",
+                address: "",
+                emergencyContact: "",
+                isAvailable: false,
+                verificationStatus: prisma_2.SitterVerificationStatus.PENDING,
+            },
         });
     }
 }

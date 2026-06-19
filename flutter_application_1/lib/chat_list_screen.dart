@@ -87,10 +87,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFF1C2632),
+      color: Colors.white,
       child: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 375, maxHeight: 812),
+          constraints: const BoxConstraints.expand(),
           decoration: BoxDecoration(
             color: _bgGrey,
             borderRadius: BorderRadius.circular(30),
@@ -98,7 +98,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
           clipBehavior: Clip.antiAlias,
           child: MediaQuery.removePadding(
             context: context,
-            removeTop: true,
+            removeTop: false,
             child: Scaffold(
               backgroundColor: Colors.transparent,
               bottomNavigationBar: const PetopiaBottomNav(activeIndex: 1),
@@ -121,22 +121,27 @@ class _ChatListScreenState extends State<ChatListScreen> {
     return Container(
       color: Colors.white,
       child: SafeArea(
-        top: false,
+        top: true,
         bottom: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              padding: const EdgeInsets.fromLTRB(12, 8, 16, 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: const Icon(Icons.arrow_back_ios_new_rounded,
-                        color: _darkText, size: 20),
+                  SizedBox(
+                    width: 44,
+                    height: 44,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded,
+                          color: _darkText, size: 20),
+                      onPressed: () => Navigator.maybePop(context),
+                      tooltip: 'Back',
+                    ),
                   ),
-                  const SizedBox(height: 8),
                   Text('messages',
                       style: GoogleFonts.plusJakartaSans(
                           fontSize: 22,
@@ -309,7 +314,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
   Widget _buildTile(Conversation conv) {
     final myId    = _myUserId ?? '';
     final name    = conv.otherParticipantName(myId);
-    final avatar  = conv.otherParticipantAvatar(myId);
+    final avatar  = _avatarUrl(conv.otherParticipantAvatar(myId));
     final snippet = conv.lastMessage?.content ?? '';
     final timeStr = conv.lastMessage != null
         ? _formatTime(conv.lastMessage!.createdAt)
@@ -433,6 +438,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
         ),
       ),
     );
+  }
+
+  String? _avatarUrl(String? value) {
+    if (value == null || value.trim().isEmpty) return null;
+    return ApiClient.absoluteUrl(value);
   }
 
   Widget _pill({required IconData icon, required String label, Color? color}) {

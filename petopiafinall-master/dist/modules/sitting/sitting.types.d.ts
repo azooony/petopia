@@ -98,6 +98,31 @@ export interface SitterReviewResponse {
     createdAt: Date;
     updatedAt: Date;
 }
+export interface ListPetForSittingData {
+    name: string;
+    breed?: string | null;
+    age: number;
+    gender?: string | null;
+    petType?: string;
+    payRatePerDay: number;
+    sittingNotes?: string | null;
+    photo?: string | null;
+}
+export interface AvailablePetResult {
+    id: string;
+    name: string;
+    breed: string | null;
+    age: number;
+    gender: string | null;
+    petType: string;
+    photo: string | null;
+    payRatePerDay: number | null;
+    sittingNotes: string | null;
+    ownerId: string;
+    ownerName: string;
+    ownerAddress: string;
+    isOwn: boolean;
+}
 export interface SearchSittersFilters {
     city?: string;
     petType?: string;

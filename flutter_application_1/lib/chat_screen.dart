@@ -261,6 +261,12 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
+  String? get _recipientImageUrl {
+    final image = widget.recipientImage;
+    if (image == null || image.trim().isEmpty) return null;
+    return ApiClient.absoluteUrl(image);
+  }
+
   void _retryMessage(Message msg) {
     if (!_isConnected || !_hasBackend) return;
     setState(() {
@@ -387,10 +393,10 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     final canSend = !_hasBackend || _isConnected;
     return Container(
-      color: const Color(0xFF1C2632),
+      color: Colors.white,
       child: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 375, maxHeight: 812),
+          constraints: const BoxConstraints.expand(),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(30),
@@ -410,30 +416,27 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
               title: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 19,
-                    backgroundColor: const Color(0xFFFFB5B5),
-                    backgroundImage: widget.recipientImage == null ||
-                            widget.recipientImage!.isEmpty
-                        ? null
-                        : widget.recipientImage!.startsWith('http')
-                            ? NetworkImage(widget.recipientImage!)
-                                as ImageProvider
-                            : AssetImage(widget.recipientImage!)
-                                as ImageProvider,
-                    child: (widget.recipientImage == null ||
-                            widget.recipientImage!.isEmpty)
-                        ? Text(
-                            widget.recipientName.isNotEmpty
-                                ? widget.recipientName[0].toUpperCase()
-                                : '?',
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15),
-                          )
-                        : null,
-                  ),
+                  Builder(builder: (context) {
+                    final recipientImageUrl = _recipientImageUrl;
+                    return CircleAvatar(
+                      radius: 19,
+                      backgroundColor: const Color(0xFFFFB5B5),
+                      backgroundImage: recipientImageUrl == null
+                          ? null
+                          : NetworkImage(recipientImageUrl) as ImageProvider,
+                      child: recipientImageUrl == null
+                          ? Text(
+                              widget.recipientName.isNotEmpty
+                                  ? widget.recipientName[0].toUpperCase()
+                                  : '?',
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15),
+                            )
+                          : null,
+                    );
+                  }),
                   const SizedBox(width: 10),
                   Text(
                     widget.recipientName,

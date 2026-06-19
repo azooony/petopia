@@ -69,6 +69,7 @@ export declare class AppointmentsRepository {
         role: import("../../../generated/prisma").$Enums.UserRole;
         createdAt: Date;
         gender: import("../../../generated/prisma").$Enums.Gender;
+        profilePicture: string | null;
     }) | null>;
     findMyAppointments(ownerId: string): Promise<({
         pet: {
@@ -87,9 +88,9 @@ export declare class AppointmentsRepository {
         id: string;
         createdAt: Date;
         startTime: Date;
-        status: import("../../../generated/prisma").$Enums.AppointmentStatus;
-        petOwnerProfileId: string | null;
         ownerId: string;
+        petOwnerProfileId: string | null;
+        status: import("../../../generated/prisma").$Enums.AppointmentStatus;
         vetId: string;
         petId: string;
         clinicName: string | null;
@@ -136,9 +137,9 @@ export declare class AppointmentsRepository {
             id: string;
             createdAt: Date;
             startTime: Date;
-            status: import("../../../generated/prisma").$Enums.AppointmentStatus;
-            petOwnerProfileId: string | null;
             ownerId: string;
+            petOwnerProfileId: string | null;
+            status: import("../../../generated/prisma").$Enums.AppointmentStatus;
             vetId: string;
             petId: string;
             clinicName: string | null;
@@ -150,6 +151,7 @@ export declare class AppointmentsRepository {
             id: string;
             createdAt: Date;
             updatedAt: Date;
+            petOwnerProfileId: string | null;
             appointmentId: string | null;
             payerId: string;
             method: import("../../../generated/prisma").$Enums.PaymentMethod;
@@ -157,7 +159,6 @@ export declare class AppointmentsRepository {
             amount: number;
             currency: string;
             proofAssetId: string | null;
-            petOwnerProfileId: string | null;
         };
         asset: {
             id: string;

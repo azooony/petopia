@@ -28,14 +28,42 @@ class PetMatchingController {
             next(err);
         }
     };
+    static getProfile = async (req, res, next) => {
+        try {
+            const data = await petMatching_service_1.PetMatchingService.getProfile(req.user.userId, req.params.petId);
+            res.json({ success: true, data });
+        }
+        catch (err) {
+            next(err);
+        }
+    };
     static findMatches = async (req, res, next) => {
         try {
             const query = petMatching_dto_1.FindMatchesQuerySchema.parse(req.query);
-            const data = await petMatching_service_1.PetMatchingService.findMatches(req.user.userId, req.params.petId, query.page, query.limit);
+            const data = await petMatching_service_1.PetMatchingService.findMatches(req.user.userId, req.params.petId, query.page, query.limit, query.gender);
             res.json({
                 success: true,
                 data,
             });
+        }
+        catch (err) {
+            next(err);
+        }
+    };
+    static deleteProfile = async (req, res, next) => {
+        try {
+            await petMatching_service_1.PetMatchingService.deleteProfile(req.user.userId, req.params.petId);
+            res.json({ success: true, message: "Match profile removed" });
+        }
+        catch (err) {
+            next(err);
+        }
+    };
+    static findAllMatches = async (req, res, next) => {
+        try {
+            const query = petMatching_dto_1.FindMatchesQuerySchema.parse(req.query);
+            const data = await petMatching_service_1.PetMatchingService.findAllMatches(query.page, query.limit, query.gender, query.type);
+            res.json({ success: true, data });
         }
         catch (err) {
             next(err);

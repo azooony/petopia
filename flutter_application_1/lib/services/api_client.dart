@@ -21,6 +21,12 @@ class ApiClient {
   static final String baseUrl =
       kIsWeb ? 'http://localhost:3000' : 'http://10.0.2.2:3000';
 
+  static String absoluteUrl(String pathOrUrl) {
+    final value = pathOrUrl.trim();
+    if (value.isEmpty || value.startsWith('http')) return value;
+    return value.startsWith('/') ? '$baseUrl$value' : '$baseUrl/$value';
+  }
+
   static Future<Map<String, String>> _authHeaders() async {
     final token = await AuthStorage.getToken();
     return {

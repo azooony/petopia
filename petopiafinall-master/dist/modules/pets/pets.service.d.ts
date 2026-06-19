@@ -22,12 +22,18 @@ export declare class PetService {
     } & {
         id: string;
         age: number;
+        createdAt: Date;
         gender: import("../../../generated/prisma").$Enums.Gender | null;
         name: string;
         description: string | null;
-        petOwnerProfileId: string | null;
+        photo: string | null;
         ownerId: string;
+        petOwnerProfileId: string | null;
         breed: string | null;
+        petType: import("../../../generated/prisma").$Enums.PetType;
+        isAvailableForSitting: boolean;
+        payRatePerDay: number | null;
+        sittingNotes: string | null;
     }>;
     static getMyPets(userId: string, query: Record<string, unknown>): Promise<({
         images: ({
@@ -50,12 +56,18 @@ export declare class PetService {
     } & {
         id: string;
         age: number;
+        createdAt: Date;
         gender: import("../../../generated/prisma").$Enums.Gender | null;
         name: string;
         description: string | null;
-        petOwnerProfileId: string | null;
+        photo: string | null;
         ownerId: string;
+        petOwnerProfileId: string | null;
         breed: string | null;
+        petType: import("../../../generated/prisma").$Enums.PetType;
+        isAvailableForSitting: boolean;
+        payRatePerDay: number | null;
+        sittingNotes: string | null;
     })[]>;
     static getPetById(userId: string, petId: string): Promise<({
         images: ({
@@ -78,12 +90,18 @@ export declare class PetService {
     } & {
         id: string;
         age: number;
+        createdAt: Date;
         gender: import("../../../generated/prisma").$Enums.Gender | null;
         name: string;
         description: string | null;
-        petOwnerProfileId: string | null;
+        photo: string | null;
         ownerId: string;
+        petOwnerProfileId: string | null;
         breed: string | null;
+        petType: import("../../../generated/prisma").$Enums.PetType;
+        isAvailableForSitting: boolean;
+        payRatePerDay: number | null;
+        sittingNotes: string | null;
     }) | null>;
     static updatePet(userId: string, petId: string, dto: UpdatePetDto): Promise<{
         images: ({
@@ -106,16 +124,38 @@ export declare class PetService {
     } & {
         id: string;
         age: number;
+        createdAt: Date;
         gender: import("../../../generated/prisma").$Enums.Gender | null;
         name: string;
         description: string | null;
-        petOwnerProfileId: string | null;
+        photo: string | null;
         ownerId: string;
+        petOwnerProfileId: string | null;
         breed: string | null;
+        petType: import("../../../generated/prisma").$Enums.PetType;
+        isAvailableForSitting: boolean;
+        payRatePerDay: number | null;
+        sittingNotes: string | null;
     }>;
     static deletePet(userId: string, petId: string): Promise<{
         success: boolean;
         message: string;
+    }>;
+    static uploadPetPhoto(userId: string, petId: string, photoUrl: string): Promise<{
+        id: string;
+        age: number;
+        createdAt: Date;
+        gender: import("../../../generated/prisma").$Enums.Gender | null;
+        name: string;
+        description: string | null;
+        photo: string | null;
+        ownerId: string;
+        petOwnerProfileId: string | null;
+        breed: string | null;
+        petType: import("../../../generated/prisma").$Enums.PetType;
+        isAvailableForSitting: boolean;
+        payRatePerDay: number | null;
+        sittingNotes: string | null;
     }>;
     static uploadPetImage(userId: string, petId: string, imageUrl: string, storageKey: string): Promise<{
         asset: {

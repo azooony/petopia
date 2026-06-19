@@ -111,12 +111,10 @@ class VetRepository {
             orderBy: { startTime: 'asc' },
             include: {
                 pet: {
-                    include: {
-                        images: {
-                            where: { isPrimary: true },
-                            include: { asset: true },
-                            take: 1,
-                        },
+                    select: {
+                        name: true,
+                        breed: true,
+                        photo: true,
                     },
                 },
                 owner: {

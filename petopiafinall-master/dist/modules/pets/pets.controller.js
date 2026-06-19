@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PetController = void 0;
 const pets_service_1 = require("./pets.service");
 const AppError_1 = require("../../common/errors/AppError");
+const VisionClient_1 = require("../../integrations/vision/VisionClient");
 class PetController {
     static createPet = async (req, res, next) => {
         try {
@@ -54,6 +55,32 @@ class PetController {
                 success: true,
                 message: "Pet deleted",
             });
+        }
+        catch (err) {
+            next(err);
+        }
+    };
+    static uploadPhoto = async (req, res, next) => {
+        try {
+            if (!req.file) {
+                throw new AppError_1.AppError('Photo file is required', AppError_1.HttpCode.BAD_REQUEST);
+            }
+            const petId = req.params.id;
+            const photoUrl = `${req.protocol}://${req.get('host')}/uploads/pets/${req.file.filename}`;
+            await pets_service_1.PetService.uploadPetPhoto(req.user.userId, petId, photoUrl);
+            res.json({ success: true, data: { photoUrl } });
+        }
+        catch (err) {
+            next(err);
+        }
+    };
+    static analyzePhoto = async (req, res, next) => {
+        try {
+            if (!req.file) {
+                throw new AppError_1.AppError('Photo file is required', AppError_1.HttpCode.BAD_REQUEST);
+            }
+            const result = await VisionClient_1.VisionClient.analyzePetImage(req.file.buffer, req.file.originalname);
+            res.json({ success: true, data: result });
         }
         catch (err) {
             next(err);

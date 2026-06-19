@@ -6,6 +6,8 @@ export declare class PetController {
     static getPet: (req: AuthRequest, res: Response, next: NextFunction) => Promise<void>;
     static updatePet: (req: AuthRequest, res: Response, next: NextFunction) => Promise<void>;
     static deletePet: (req: AuthRequest, res: Response, next: NextFunction) => Promise<void>;
+    static uploadPhoto: (req: AuthRequest, res: Response, next: NextFunction) => Promise<void>;
+    static analyzePhoto: (req: AuthRequest, res: Response, next: NextFunction) => Promise<void>;
     static uploadImage: (req: AuthRequest, res: Response, next: NextFunction) => Promise<void>;
 }
 //# sourceMappingURL=pets.controller.d.ts.map

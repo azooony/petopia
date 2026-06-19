@@ -239,6 +239,10 @@ class _UserProfileState extends State<UserProfile> {
         }
       }
 
+      if (_petId != null) {
+        await _syncExistingMatchProfile();
+      }
+
       if (!mounted) return;
       _showAddedDialog();
     } catch (e) {
@@ -253,6 +257,23 @@ class _UserProfileState extends State<UserProfile> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  Future<void> _syncExistingMatchProfile() async {
+    final petId = _petId;
+    if (petId == null) return;
+
+    final profileRes = await ApiClient.get('/matching/profile/$petId');
+    final profileData = profileRes['data'] as Map<String, dynamic>?;
+    final profile = profileData?['profile'] as Map<String, dynamic>?;
+    if (profile == null) return;
+
+    await ApiClient.post('/matching/profile', {
+      'petId': petId,
+      'description': _aboutController.text.trim(),
+      'address': _addressController.text.trim(),
+      'preferredBreed': _breedController.text.trim(),
+    });
   }
 
   void _showAddedDialog() {
@@ -348,11 +369,11 @@ class _UserProfileState extends State<UserProfile> {
         textTheme: GoogleFonts.plusJakartaSansTextTheme(Theme.of(context).textTheme),
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFF1C2632),
+        backgroundColor: Colors.white,
         body: Center(
           child: Container(
-            width: 381.66,
-            height: 850.32,
+            width: double.infinity,
+            height: double.infinity,
             decoration: ShapeDecoration(
               color: Colors.white,
               shape: RoundedRectangleBorder(

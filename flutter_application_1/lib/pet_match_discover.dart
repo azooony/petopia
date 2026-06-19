@@ -83,10 +83,10 @@ class _PetMatchDiscoverState extends State<PetMatchDiscover> {
     final pets = _filtered;
 
     return Container(
-      color: const Color(0xFF1C2632),
+      color: Colors.white,
       child: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 375, maxHeight: 812),
+          constraints: const BoxConstraints.expand(),
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(color: Colors.grey[300]!),
@@ -209,11 +209,11 @@ class _PetMatchDiscoverState extends State<PetMatchDiscover> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Delete pet?',
+        title: Text('Remove from matching?',
             style: GoogleFonts.plusJakartaSans(
                 fontWeight: FontWeight.w700, fontSize: 16)),
         content: Text(
-          '${pet.petName} will be permanently deleted. You\'ll need to add your pet again if you want to find a match.',
+          '${pet.petName} will be removed from the pet matching list. Your pet profile will stay saved.',
           style: GoogleFonts.plusJakartaSans(
               fontSize: 13, color: const Color(0xFF9E9E9E)),
         ),
@@ -226,7 +226,7 @@ class _PetMatchDiscoverState extends State<PetMatchDiscover> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Delete',
+            child: Text('Remove',
                 style: GoogleFonts.plusJakartaSans(
                     color: _coral, fontWeight: FontWeight.w700)),
           ),
@@ -235,13 +235,22 @@ class _PetMatchDiscoverState extends State<PetMatchDiscover> {
     );
     if (confirmed != true || !mounted) return;
     try {
-      await PetMatchingService.deletePet(pet.petId);
+      await PetMatchingService.deleteMatchProfile(pet.petId);
       if (!mounted) return;
-      Navigator.pop(context); // back to PetMatching selection screen
+      setState(() {
+        _matches.removeWhere((p) => p.petId == pet.petId);
+        if (_myPetId == pet.petId) _myPetId = null;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('${pet.petName} was removed from matching.',
+            style: GoogleFonts.plusJakartaSans(fontSize: 13)),
+        backgroundColor: _coral,
+        behavior: SnackBarBehavior.floating,
+      ));
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Failed to delete pet.',
+        content: Text('Failed to remove pet from matching.',
             style: GoogleFonts.plusJakartaSans(fontSize: 13)),
         backgroundColor: Colors.redAccent,
         behavior: SnackBarBehavior.floating,

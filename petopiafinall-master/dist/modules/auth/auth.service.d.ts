@@ -15,6 +15,7 @@ export declare class AuthService {
             role: import("../../../generated/prisma").$Enums.UserRole;
             createdAt: Date;
             gender: import("../../../generated/prisma").$Enums.Gender;
+            profilePicture: string | null;
         };
         token: string;
     }>;
@@ -33,7 +34,7 @@ export declare class AuthService {
         appointmentPrice?: number | string;
         startTime?: string;
         endTime?: string;
-    }, certificateFile: Express.Multer.File): Promise<{
+    }, certificateFile: Express.Multer.File, photoFile: Express.Multer.File): Promise<{
         message: string;
         user: {
             vetProfile: {
@@ -60,6 +61,7 @@ export declare class AuthService {
             role: import("../../../generated/prisma").$Enums.UserRole;
             createdAt: Date;
             gender: import("../../../generated/prisma").$Enums.Gender;
+            profilePicture: string | null;
         };
     }>;
     static login(email: string, password: string): Promise<{
@@ -88,6 +90,7 @@ export declare class AuthService {
             role: import("../../../generated/prisma").$Enums.UserRole;
             createdAt: Date;
             gender: import("../../../generated/prisma").$Enums.Gender;
+            profilePicture: string | null;
         };
         token: string;
     }>;

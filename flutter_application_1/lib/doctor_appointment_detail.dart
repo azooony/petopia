@@ -74,11 +74,11 @@ class _DoctorAppointmentDetailState extends State<DoctorAppointmentDetail> {
     final apt = widget.appointment;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1C2632),
+      backgroundColor: Colors.white,
       body: Center(
         child: Container(
-          width: 381.66,
-          height: 850.32,
+          width: double.infinity,
+            height: double.infinity,
           decoration: ShapeDecoration(
             color: const Color(0xFFF6F6F6),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(46)),

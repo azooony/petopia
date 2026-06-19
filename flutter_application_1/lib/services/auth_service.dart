@@ -38,8 +38,10 @@ class AuthService {
     required String clinicAddress,
     required List<int> certificateBytes,
     required String certificateFilename,
+    required List<int> photoBytes,
+    required String photoFilename,
   }) async {
-    await ApiClient.multipartPostBytes(
+    await ApiClient.multipartPostMultipleFiles(
       '/auth/register-vet',
       fields: {
         'fullName': fullName,
@@ -53,9 +55,18 @@ class AuthService {
         'clinicPhone': phone,
         'yearsOfExperience': '1',
       },
-      bytes: certificateBytes,
-      filename: certificateFilename,
-      fileField: 'certificate',
+      files: [
+        {
+          'field': 'certificate',
+          'bytes': certificateBytes,
+          'filename': certificateFilename,
+        },
+        {
+          'field': 'photo',
+          'bytes': photoBytes,
+          'filename': photoFilename,
+        },
+      ],
     );
   }
 

@@ -1,20 +1,21 @@
 "use strict";
-// // src/integrations/vision/VisionClient.ts
 Object.defineProperty(exports, "__esModule", { value: true });
-// export interface PetAnalysisResult {
-//   species: 'DOG' | 'CAT';
-//   breed: string;
-//   confidence: number;
-// }
-// export class VisionClient {
-//   // If you switch APIs later, you only change this file.
-//   async analyzePetImage(imageBuffer: Buffer): Promise<PetAnalysisResult> {
-//     try {
-//       // Integration logic for Google Vision or OpenAI goes here
-//       return { species: 'DOG', breed: 'Golden Retriever', confidence: 0.98 };
-//     } catch (error) {
-//       throw new AppError("AI Analysis failed", HttpCode.INTERNAL_SERVER_ERROR);
-//     }
-//   }
-// }
+exports.VisionClient = void 0;
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL ?? 'http://localhost:5001';
+class VisionClient {
+    static async analyzePetImage(imageBuffer, filename = 'photo.jpg') {
+        const form = new FormData();
+        form.append('photo', new Blob([new Uint8Array(imageBuffer)], { type: 'image/jpeg' }), filename);
+        const res = await fetch(`${AI_SERVICE_URL}/classify`, {
+            method: 'POST',
+            body: form,
+        });
+        const json = await res.json();
+        if (!res.ok) {
+            throw new Error(json['error'] ?? 'AI service error');
+        }
+        return json;
+    }
+}
+exports.VisionClient = VisionClient;
 //# sourceMappingURL=VisionClient.js.map

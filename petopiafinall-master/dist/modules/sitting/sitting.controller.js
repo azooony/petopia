@@ -536,6 +536,106 @@ class SittingController {
             return next(err);
         }
     }
+    // ─────────────────────────────────────────────────────────────────────────────
+    // Pet Listing for Sitting
+    // ─────────────────────────────────────────────────────────────────────────────
+    static async listPetForSitting(req, res, next) {
+        try {
+            if (!req.user?.userId) {
+                throw new AppError_1.AppError("Unauthorized", AppError_1.HttpCode.UNAUTHORIZED);
+            }
+            const parsed = sitting_dto_1.ListPetForSittingSchema.safeParse(req.body);
+            if (!parsed.success) {
+                return res.status(AppError_1.HttpCode.BAD_REQUEST).json({
+                    success: false,
+                    message: "Validation failed",
+                    error: parsed.error.flatten().fieldErrors,
+                });
+            }
+            const pet = await sitting_service_1.SittingService.listPetForSitting(req.user.userId, parsed.data, req.file);
+            return res.status(AppError_1.HttpCode.CREATED).json({
+                success: true,
+                message: "Pet listed for sitting successfully",
+                data: pet,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    }
+    static async unlistPet(req, res, next) {
+        try {
+            if (!req.user?.userId) {
+                throw new AppError_1.AppError("Unauthorized", AppError_1.HttpCode.UNAUTHORIZED);
+            }
+            await sitting_service_1.SittingService.unlistPet(req.user.userId);
+            return res.json({
+                success: true,
+                message: "Pet removed from sitting list",
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    }
+    static async getAvailablePets(req, res, next) {
+        try {
+            if (!req.user?.userId) {
+                throw new AppError_1.AppError("Unauthorized", AppError_1.HttpCode.UNAUTHORIZED);
+            }
+            const petType = req.query.type;
+            const pets = await sitting_service_1.SittingService.getAvailablePets(req.user.userId, petType);
+            return res.json({
+                success: true,
+                message: "Available pets retrieved",
+                data: pets,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    }
+    static async getSitterStatus(req, res, next) {
+        try {
+            if (!req.user?.userId) {
+                throw new AppError_1.AppError("Unauthorized", AppError_1.HttpCode.UNAUTHORIZED);
+            }
+            const result = await sitting_service_1.SittingService.getSitterStatus(req.user.userId);
+            return res.json({
+                success: true,
+                message: "Sitter status retrieved",
+                data: result,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    }
+    static async registerSitter(req, res, next) {
+        try {
+            if (!req.user?.userId) {
+                throw new AppError_1.AppError("Unauthorized", AppError_1.HttpCode.UNAUTHORIZED);
+            }
+            const files = req.files;
+            const nationalIdFile = files?.["nationalIdPhoto"]?.[0];
+            const venuePhotoFile = files?.["venuePhoto"]?.[0];
+            if (!nationalIdFile) {
+                throw new AppError_1.AppError("National ID photo is required", AppError_1.HttpCode.BAD_REQUEST);
+            }
+            if (!venuePhotoFile) {
+                throw new AppError_1.AppError("Venue photo is required", AppError_1.HttpCode.BAD_REQUEST);
+            }
+            const profile = await sitting_service_1.SittingService.registerSitter(req.user.userId, nationalIdFile, venuePhotoFile);
+            return res.status(AppError_1.HttpCode.CREATED).json({
+                success: true,
+                message: "Registration submitted. Awaiting admin approval.",
+                data: profile,
+            });
+        }
+        catch (err) {
+            return next(err);
+        }
+    }
 }
 exports.SittingController = SittingController;
 //# sourceMappingURL=sitting.controller.js.map

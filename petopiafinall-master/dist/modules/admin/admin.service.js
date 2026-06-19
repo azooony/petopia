@@ -9,6 +9,8 @@ const jwt_1 = require("@/common/utils/jwt");
 const AppError_1 = require("@/common/errors/AppError");
 const prisma_1 = require("../../../generated/prisma");
 const admin_repository_1 = require("./admin.repository");
+const notification_helpers_1 = require("../Notification/notification.helpers");
+const notification_templates_1 = require("../Notification/notification.templates");
 class AdminService {
     repo;
     constructor(repo) {
@@ -44,6 +46,7 @@ class AdminService {
             entityType: "VetProfile",
             entityId: vetProfileId,
         });
+        (0, notification_helpers_1.fireNotification)((0, notification_templates_1.notifyVetApproved)(updated.user.id, vetProfileId));
         return updated;
     }
     async rejectVet(vetProfileId, adminId) {
@@ -60,6 +63,7 @@ class AdminService {
             entityType: "VetProfile",
             entityId: vetProfileId,
         });
+        (0, notification_helpers_1.fireNotification)((0, notification_templates_1.notifyVetRejected)(profile.userId, vetProfileId));
         return updated;
     }
     // ── Sitters ───────────────────────────────────────────────────────────────
@@ -80,6 +84,7 @@ class AdminService {
             entityType: "SitterProfile",
             entityId: serviceId,
         });
+        (0, notification_helpers_1.fireNotification)((0, notification_templates_1.notifySitterApproved)(updated.user.id, serviceId));
         return updated;
     }
     async rejectSitter(serviceId, adminId) {
@@ -96,6 +101,7 @@ class AdminService {
             entityType: "SitterProfile",
             entityId: serviceId,
         });
+        (0, notification_helpers_1.fireNotification)((0, notification_templates_1.notifySitterRejected)(listing.userId, serviceId));
         return updated;
     }
     // ── Payments ──────────────────────────────────────────────────────────────
@@ -123,6 +129,11 @@ class AdminService {
             entityId: paymentId,
             meta: { appointmentId: payment.appointmentId },
         });
+        const appt = payment.appointment;
+        if (appt) {
+            (0, notification_helpers_1.fireNotification)((0, notification_templates_1.notifyPaymentApproved)(appt.owner.id, paymentId, appt.id));
+            (0, notification_helpers_1.fireNotification)((0, notification_templates_1.notifyAppointmentConfirmedForVet)(appt.vet.id, appt.id, appt.pet.name ?? undefined));
+        }
         return { payment: updatedPayment, appointment: updatedAppointment };
     }
     async rejectPayment(paymentId, adminId) {
@@ -146,6 +157,10 @@ class AdminService {
             entityId: paymentId,
             meta: { appointmentId: payment.appointmentId },
         });
+        const appt = payment.appointment;
+        if (appt) {
+            (0, notification_helpers_1.fireNotification)((0, notification_templates_1.notifyPaymentRejected)(appt.owner.id, paymentId, appt.id));
+        }
         return { payment: updatedPayment, appointment: updatedAppointment };
     }
 }

@@ -131,7 +131,7 @@ class MatchPet {
       petAge:      (pet['age'] as num?)?.toInt() ?? 0,
       petBreed:    pet['breed']      as String?,
       petGender:   pet['gender']     as String?,
-      description: j['description']  as String?,
+      description: (pet['description'] as String?) ?? (j['description'] as String?),
       address:     j['address']      as String?,
       imageUrl:    imageUrl,
       ownerId:     owner['id']       as String? ?? '',

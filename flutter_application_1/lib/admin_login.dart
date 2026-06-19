@@ -74,10 +74,10 @@ class _AdminLoginState extends State<AdminLogin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1C2632),
+      backgroundColor: Colors.white,
       body: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 375, maxHeight: 812),
+          constraints: const BoxConstraints.expand(),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(30),

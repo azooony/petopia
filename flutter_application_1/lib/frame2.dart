@@ -7,185 +7,158 @@ class Frame2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 18, 32, 47),
-      body: Center(
-        child: ListView(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(
           children: [
-            Column(
-              children: [
-                Container(
-                  width: 390.67,
-                  height: 851.42,
+            const SizedBox(height: 20),
+            // ── Petopia header image ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Image.asset(
+                "assets/images/imagee.png",
+                width: double.infinity,
+                height: 80,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(height: 16),
+            // ── Hero image (doctor) ──
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 80),
+                child: Container(
                   decoration: ShapeDecoration(
-                    color: Colors.white,
+                    image: const DecorationImage(
+                      image: AssetImage("assets/images/dr.png"),
+                      fit: BoxFit.cover,
+                    ),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(46),
+                      borderRadius: BorderRadius.circular(38),
                     ),
                   ),
-                  child: Stack(
-                    children: [
-                      Positioned(
-                        left: 91,
-                        top: 641,
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const Frame3()),
-                              );
-                            },
-                            borderRadius: BorderRadius.circular(20),
-                            child: Ink(
-                              width: 200,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFF7578),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  'Continue',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            // ── Title text ──
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Track ',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 23,
+                        fontWeight: FontWeight.w700,
+                        height: 1.30,
                       ),
-                      Positioned(
-                        left: 69.88,
-                        top: 192,
-                        child: Container(
-                          width: 227.12,
-                          height: 239.22,
-                          decoration: ShapeDecoration(
-                            image: const DecorationImage(
-                              image: AssetImage("assets/images/dr.png"),
-                              fit: BoxFit.cover,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(38),
-                            ),
-                          ),
-                        ),
+                    ),
+                    TextSpan(
+                      text: 'Vet Appointments',
+                      style: TextStyle(
+                        color: const Color(0xFFED6663),
+                        fontSize: 23,
+                        fontWeight: FontWeight.w700,
+                        height: 1.30,
                       ),
-                      Positioned(
-                        left: 28.97,
-                        top: 517,
-                        child: SizedBox(
-                          width: 350.04,
-                          height: 123.12,
-                          child: Text.rich(
-                            TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: 'Track ',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 23,
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.30,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: 'Vet Appointments',
-                                  style: TextStyle(
-                                    color: const Color(0xFFED6663),
-                                    fontSize: 23,
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.30,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: ' and ',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 23,
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.30,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: 'Medication Schedules',
-                                  style: TextStyle(
-                                    color: const Color(0xFFED6663),
-                                    fontSize: 23,
-                                    fontWeight: FontWeight.w700,
-                                    height: 1.30,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                    ),
+                    TextSpan(
+                      text: ' and ',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 23,
+                        fontWeight: FontWeight.w700,
+                        height: 1.30,
                       ),
-                      Positioned(
-                        left: -0.25,
-                        top: 94,
-                        child: Container(
-                          width: 367.26,
-                          height: 95.11,
-                          decoration: const BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage("assets/images/imagee.png"),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
+                    ),
+                    TextSpan(
+                      text: 'Medication Schedules',
+                      style: TextStyle(
+                        color: const Color(0xFFED6663),
+                        fontSize: 23,
+                        fontWeight: FontWeight.w700,
+                        height: 1.30,
                       ),
-                      Positioned(
-                        left: 203,
-                        top: 757,
-                        child: Container(
-                          width: 7.06,
-                          height: 7.36,
-                          decoration: ShapeDecoration(
-                            color: const Color(0xFFEFD2D3),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.35),
-                            ),
-                          ),
-                        ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 32),
+            // ── Continue button ──
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const Frame3()),
+                  );
+                },
+                borderRadius: BorderRadius.circular(20),
+                child: Ink(
+                  width: 200,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF7578),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Continue',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
                       ),
-                      Positioned(
-                        left: 215,
-                        top: 757,
-                        child: Container(
-                          width: 17.06,
-                          height: 7.44,
-                          decoration: ShapeDecoration(
-                            color: const Color(0xFFFF9DA0),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.35),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        left: 237,
-                        top: 757,
-                        child: Container(
-                          width: 7.06,
-                          height: 7.36,
-                          decoration: ShapeDecoration(
-                            color: const Color(0xFFEFD2D3),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.35),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            // ── Dot indicators ──
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 7,
+                  height: 7,
+                  decoration: ShapeDecoration(
+                    color: const Color(0xFFEFD2D3),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Container(
+                  width: 17,
+                  height: 7,
+                  decoration: ShapeDecoration(
+                    color: const Color(0xFFFF9DA0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Container(
+                  width: 7,
+                  height: 7,
+                  decoration: ShapeDecoration(
+                    color: const Color(0xFFEFD2D3),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
               ],
             ),
+            const SizedBox(height: 32),
           ],
         ),
       ),

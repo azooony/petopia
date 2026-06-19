@@ -43,10 +43,10 @@ class _DoctorDetailsState extends State<DoctorDetails> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFF1C2632),
+      color: Colors.white,
       child: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 375, maxHeight: 812),
+          constraints: const BoxConstraints.expand(),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(30),
@@ -130,7 +130,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF1C2632),
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -167,7 +167,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF1C2632),
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 10),

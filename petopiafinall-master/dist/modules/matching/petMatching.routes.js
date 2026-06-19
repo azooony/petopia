@@ -9,9 +9,12 @@ const petMatching_controller_1 = require("./petMatching.controller");
 const router = (0, express_1.Router)();
 router.use(auth_middleware_1.protect, (0, auth_middleware_1.restrictTo)(prisma_1.UserRole.PET_OWNER));
 // PROFILE
+router.get("/profile/:petId", petMatching_controller_1.PetMatchingController.getProfile);
 router.post("/profile", (0, validate_middleware_1.validate)(petMatching_dto_1.CreateMatchProfileSchema), petMatching_controller_1.PetMatchingController.createProfile);
 router.patch("/profile/:petId", (0, validate_middleware_1.validate)(petMatching_dto_1.UpdateMatchProfileSchema), petMatching_controller_1.PetMatchingController.updateProfile);
+router.delete("/profile/:petId", petMatching_controller_1.PetMatchingController.deleteProfile);
 // MATCHES
+router.get("/discover", petMatching_controller_1.PetMatchingController.findAllMatches);
 router.get("/discover/:petId", petMatching_controller_1.PetMatchingController.findMatches);
 // REQUESTS
 router.post("/request", (0, validate_middleware_1.validate)(petMatching_dto_1.SendMatchRequestSchema), petMatching_controller_1.PetMatchingController.sendRequest);

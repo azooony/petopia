@@ -95,9 +95,10 @@ model Clinic {
 }
 
 model Pet {
-  id                String  @id @default(cuid())
-  ownerId           String  @unique
+  id                String   @id @default(cuid())
+  ownerId           String   @unique
   petOwnerProfileId String?
+  createdAt         DateTime @default(now())
 
   name        String
   age         Int

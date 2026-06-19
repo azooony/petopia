@@ -20,5 +20,7 @@ exports.SendMatchRequestSchema = zod_1.z.object({
 exports.FindMatchesQuerySchema = zod_1.z.object({
     page: zod_1.z.coerce.number().int().min(1).default(1),
     limit: zod_1.z.coerce.number().int().min(1).max(50).default(10),
+    gender: zod_1.z.enum(['MALE', 'FEMALE']).optional(),
+    type: zod_1.z.enum(['DOG', 'CAT']).optional(),
 });
 //# sourceMappingURL=petMatching.dto.js.map

@@ -12,6 +12,7 @@ class _PendingVet {
   final String clinicName;
   final String clinicAddress;
   final String certificateImage;
+  final String photo;
   String status;
 
   _PendingVet({
@@ -21,6 +22,7 @@ class _PendingVet {
     required this.clinicName,
     required this.clinicAddress,
     required this.certificateImage,
+    required this.photo,
     required this.status,
   });
 
@@ -34,6 +36,7 @@ class _PendingVet {
       clinicName:       clinic['name']          as String? ?? '',
       clinicAddress:    clinic['address']       as String? ?? '',
       certificateImage: j['certificateImage']   as String? ?? '',
+      photo:            j['photo']              as String? ?? '',
       status:           j['verificationStatus'] as String? ?? 'PENDING',
     );
   }
@@ -293,10 +296,10 @@ class _AdminDashboardState extends State<AdminDashboard>
     final pendingPayCount = _payments.where((p) => p.status == 'PENDING').length;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1C2632),
+      backgroundColor: Colors.white,
       body: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 375, maxHeight: 812),
+          constraints: const BoxConstraints.expand(),
           decoration: BoxDecoration(
             color: _bg,
             borderRadius: BorderRadius.circular(30),
@@ -430,11 +433,7 @@ class _AdminDashboardState extends State<AdminDashboard>
         children: [
           Row(
             children: [
-              Container(
-                width: 42, height: 42,
-                decoration: BoxDecoration(color: _coral.withValues(alpha: 0.10), shape: BoxShape.circle),
-                child: const Icon(Icons.person_outline_rounded, color: _coral, size: 22),
-              ),
+              _doctorAvatar(vet.photo),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -721,6 +720,35 @@ class _AdminDashboardState extends State<AdminDashboard>
   }
 
   // ── Shared helpers ─────────────────────────────────────────────────────────
+
+  Widget _doctorAvatar(String photo) {
+    final fallback = Container(
+      width: 42,
+      height: 42,
+      decoration: BoxDecoration(
+        color: _coral.withValues(alpha: 0.10),
+        shape: BoxShape.circle,
+      ),
+      child: const Icon(Icons.person_outline_rounded,
+          color: _coral, size: 22),
+    );
+
+    if (photo.isEmpty) return fallback;
+
+    final imageUrl = photo.startsWith('http')
+        ? photo
+        : '${ApiClient.baseUrl}$photo';
+
+    return ClipOval(
+      child: Image.network(
+        imageUrl,
+        width: 42,
+        height: 42,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => fallback,
+      ),
+    );
+  }
 
   Widget _infoChip(IconData icon, String label, Color color) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),

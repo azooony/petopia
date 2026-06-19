@@ -128,18 +128,14 @@ class _VetAppointmentsState extends State<VetAppointments> {
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 10),
           child: Text(
             'Your Appointments',
-            style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFF1C2632)),
+            style: GoogleFonts.plusJakartaSans(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF1A1919)),
           ),
         ),
         ..._myAppointments.map(_buildMyAppointmentCard),
         const Divider(height: 24, indent: 16, endIndent: 16),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-          child: Text(
-            'Available Vets',
-            style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFF1C2632)),
-          ),
-        ),
       ],
     );
   }
@@ -172,7 +168,13 @@ class _VetAppointmentsState extends State<VetAppointments> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(apt.vetName, style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF1C2632))),
+                Text(
+                  apt.vetName,
+                  style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF1A1919)),
+                ),
                 const SizedBox(height: 2),
                 Text('${apt.petName} · ${apt.formattedDate}', style: GoogleFonts.plusJakartaSans(fontSize: 12, color: Colors.grey[600])),
                 Text(apt.formattedTime, style: GoogleFonts.plusJakartaSans(fontSize: 12, color: Colors.grey[600])),
@@ -345,10 +347,10 @@ class _VetAppointmentsState extends State<VetAppointments> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFF1C2632),
+      color: Colors.white,
       child: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 375, maxHeight: 812),
+          constraints: const BoxConstraints.expand(),
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(color: Colors.grey[300]!),
@@ -423,6 +425,18 @@ class _VetAppointmentsState extends State<VetAppointments> {
       padding: const EdgeInsets.fromLTRB(0, 8, 0, 100),
       children: [
         _buildMyAppointmentsSection(),
+        if (_doctors.isNotEmpty)
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+                16, _myAppointments.isEmpty ? 8 : 0, 16, 10),
+            child: Text(
+              'Available doctors',
+              style: GoogleFonts.plusJakartaSans(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF1A1919)),
+            ),
+          ),
         ..._doctors.map((d) => Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: _buildVetCard(context, d),

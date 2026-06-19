@@ -66,4 +66,20 @@ export declare const SearchSittersSchema: z.ZodObject<{
     }>>>;
 }, z.core.$strip>;
 export type SearchSittersInput = z.infer<typeof SearchSittersSchema>;
+export declare const ListPetForSittingSchema: z.ZodObject<{
+    petName: z.ZodString;
+    breed: z.ZodNullable<z.ZodOptional<z.ZodString>>;
+    age: z.ZodCoercedNumber<unknown>;
+    gender: z.ZodNullable<z.ZodOptional<z.ZodEnum<{
+        MALE: "MALE";
+        FEMALE: "FEMALE";
+    }>>>;
+    petType: z.ZodDefault<z.ZodEnum<{
+        DOG: "DOG";
+        CAT: "CAT";
+    }>>;
+    payRatePerDay: z.ZodCoercedNumber<unknown>;
+    sittingNotes: z.ZodNullable<z.ZodOptional<z.ZodString>>;
+}, z.core.$strip>;
+export type ListPetForSittingInput = z.infer<typeof ListPetForSittingSchema>;
 //# sourceMappingURL=sitting.dto.d.ts.map

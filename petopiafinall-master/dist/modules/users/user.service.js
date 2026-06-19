@@ -22,7 +22,14 @@ class UserService {
         if (baseUser.role === "PET_OWNER") {
             user = await prisma_1.default.user.findUnique({
                 where: { id: userId },
-                include: { ownerProfile: true },
+                include: {
+                    ownerProfile: true,
+                    pets: {
+                        include: {
+                            images: { include: { asset: true } },
+                        },
+                    },
+                },
             });
         }
         else if (baseUser.role === "VET") {
@@ -40,6 +47,7 @@ class UserService {
             throw new AppError_1.AppError("User not found", 404);
         }
         const { passwordHash, ...safeUser } = user;
+        const ownerProfile = safeUser.ownerProfile ?? null;
         return {
             id: safeUser.id,
             email: safeUser.email,
@@ -48,8 +56,11 @@ class UserService {
             createdAt: safeUser.createdAt,
             age: safeUser.age,
             gender: safeUser.gender,
+            profilePicture: safeUser.profilePicture ?? null,
+            address: ownerProfile?.address ?? '',
+            pets: safeUser.role === "PET_OWNER" ? safeUser.pets ?? null : null,
             profile: safeUser.role === "PET_OWNER"
-                ? safeUser.ownerProfile ?? null
+                ? ownerProfile
                 : safeUser.role === "VET"
                     ? safeUser.vetProfile ?? null
                     : null,
@@ -221,6 +232,31 @@ class UserService {
             message: "Profile deleted successfully",
             userId,
         };
+    }
+    // UPLOAD AVATAR
+    static async uploadAvatar(userId, avatarUrl) {
+        const user = await prisma_1.default.user.findUnique({ where: { id: userId } });
+        if (!user)
+            throw new AppError_1.AppError("User not found", 404);
+        await prisma_1.default.user.update({
+            where: { id: userId },
+            data: { profilePicture: avatarUrl },
+        });
+        return this.getMe(userId);
+    }
+    // BLOCK USER
+    static async blockUser(blockerId, blockedId) {
+        if (blockerId === blockedId) {
+            throw new AppError_1.AppError("You cannot block yourself.", 400);
+        }
+        const target = await prisma_1.default.user.findUnique({ where: { id: blockedId } });
+        if (!target)
+            throw new AppError_1.AppError("User not found.", 404);
+        await prisma_1.default.userBlock.upsert({
+            where: { blockerId_blockedId: { blockerId, blockedId } },
+            create: { blockerId, blockedId },
+            update: {},
+        });
     }
 }
 exports.UserService = UserService;

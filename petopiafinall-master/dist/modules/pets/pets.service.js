@@ -32,6 +32,7 @@ class PetService {
             breed: dto.breed ?? null,
             gender: dto.gender ?? null,
             description: dto.description ?? null,
+            ...(dto.petType !== undefined && { petType: dto.petType }),
         });
     }
     // ───────────────────────── GET ALL ─────────────────────────
@@ -64,6 +65,7 @@ class PetService {
             ...(dto.breed !== undefined && { breed: dto.breed }),
             ...(dto.gender !== undefined && { gender: dto.gender }),
             ...(dto.description !== undefined && { description: dto.description }),
+            ...(dto.petType !== undefined && { petType: dto.petType }),
         });
     }
     // ───────────────────────── DELETE ─────────────────────────
@@ -78,6 +80,14 @@ class PetService {
             success: true,
             message: "Pet deleted successfully",
         };
+    }
+    // ───────────────────────── UPLOAD PHOTO ─────────────────────────
+    static async uploadPetPhoto(userId, petId, photoUrl) {
+        if (!petId)
+            throw new AppError_1.AppError('Pet ID is required', AppError_1.HttpCode.BAD_REQUEST);
+        const pet = await pets_repository_1.PetRepository.findPetById(petId);
+        pet_policy_1.PetPolicy.ensureOwner(pet, userId);
+        return pets_repository_1.PetRepository.updatePetPhoto(petId, photoUrl);
     }
     // ───────────────────────── UPLOAD IMAGE ─────────────────────────
     static async uploadPetImage(userId, petId, imageUrl, storageKey) {

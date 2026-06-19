@@ -4,6 +4,8 @@ exports.appointmentsService = exports.AppointmentsService = void 0;
 const prisma_1 = require("../../../generated/prisma");
 const AppError_1 = require("../../common/errors/AppError");
 const appointments_repository_1 = require("./appointments.repository");
+const notification_helpers_1 = require("../Notification/notification.helpers");
+const notification_templates_1 = require("../Notification/notification.templates");
 class AppointmentsService {
     repo;
     constructor(repo) {
@@ -33,7 +35,7 @@ class AppointmentsService {
             throw new AppError_1.AppError("Pet not found for this owner", AppError_1.HttpCode.NOT_FOUND);
         }
         try {
-            return await this.repo.bookAtomically({
+            const result = await this.repo.bookAtomically({
                 ownerId,
                 vetId: dto.vetId,
                 petId: dto.petId,
@@ -50,6 +52,8 @@ class AppointmentsService {
                 invoiceMimeType: invoiceFile.mimetype,
                 invoiceSizeBytes: invoiceFile.size,
             });
+            (0, notification_helpers_1.fireNotification)((0, notification_templates_1.notifyAppointmentBookedPending)(ownerId, result.appointment.id));
+            return result;
         }
         catch (err) {
             if (err instanceof appointments_repository_1.ConflictError) {

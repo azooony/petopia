@@ -47,13 +47,14 @@ class PetMatchingRepository {
         });
     }
     // FIND MATCHES
-    static findAvailablePets(currentPetId, breed, skip = 0, take = 10) {
+    static findAvailablePets(currentPetId, breed, gender, skip = 0, take = 10) {
         return prisma_1.default.petMatchProfile.findMany({
             where: {
                 petId: {
                     not: currentPetId,
                 },
                 isavailable: true,
+                ...(gender && { pet: { gender: gender } }),
                 ...(breed && {
                     OR: [
                         {
@@ -63,6 +64,46 @@ class PetMatchingRepository {
                             preferredBreed: null,
                         },
                     ],
+                }),
+            },
+            include: {
+                pet: {
+                    include: {
+                        owner: {
+                            select: {
+                                id: true,
+                                fullName: true,
+                            },
+                        },
+                        images: {
+                            include: {
+                                asset: true,
+                            },
+                        },
+                    },
+                },
+            },
+            skip,
+            take,
+            orderBy: {
+                pet: {
+                    age: "asc",
+                },
+            },
+        });
+    }
+    static deleteProfile(petId) {
+        return prisma_1.default.petMatchProfile.delete({ where: { petId } });
+    }
+    static findAllAvailablePets(gender, skip = 0, take = 50, petType) {
+        return prisma_1.default.petMatchProfile.findMany({
+            where: {
+                isavailable: true,
+                ...((gender || petType) && {
+                    pet: {
+                        ...(gender && { gender: gender }),
+                        ...(petType && { petType: petType }),
+                    },
                 }),
             },
             include: {
@@ -193,15 +234,9 @@ class PetMatchingRepository {
         }
         return db.conversation.create({
             data: {
+                type: prisma_2.ConversationType.MATCHING,
                 participants: {
-                    create: [
-                        {
-                            userId: userA,
-                        },
-                        {
-                            userId: userB,
-                        },
-                    ],
+                    create: [{ userId: userA }, { userId: userB }],
                 },
             },
             include: {

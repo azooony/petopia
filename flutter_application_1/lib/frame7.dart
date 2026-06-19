@@ -39,6 +39,8 @@ class _Frame7State extends State<Frame7> {
 
   Uint8List? _certificateBytes;
   String    _certificateFilename = 'certificate.jpg';
+  Uint8List? _doctorPhotoBytes;
+  String    _doctorPhotoFilename = 'doctor_photo.jpg';
 
   static const _coral = Color(0xFFFF7578);
 
@@ -85,10 +87,26 @@ class _Frame7State extends State<Frame7> {
     }
   }
 
+  Future<void> _pickDoctorPhoto() async {
+    final picker = ImagePicker();
+    final XFile? file = await picker.pickImage(source: ImageSource.gallery);
+    if (file != null) {
+      final bytes = await file.readAsBytes();
+      setState(() {
+        _doctorPhotoBytes    = bytes;
+        _doctorPhotoFilename = file.name;
+      });
+    }
+  }
+
   Future<void> _handleSubmit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_certificateBytes == null) {
       _showSnack('Please upload your certificate', isError: false);
+      return;
+    }
+    if (_doctorPhotoBytes == null) {
+      _showSnack('Please upload your doctor photo', isError: false);
       return;
     }
     if (!_agreedToTerms) {
@@ -109,6 +127,8 @@ class _Frame7State extends State<Frame7> {
         clinicAddress:         _clinicLocationController.text.trim(),
         certificateBytes:      _certificateBytes!,
         certificateFilename:   _certificateFilename,
+        photoBytes:            _doctorPhotoBytes!,
+        photoFilename:         _doctorPhotoFilename,
       );
       if (!mounted) return;
       _showPendingDialog();
@@ -202,12 +222,12 @@ class _Frame7State extends State<Frame7> {
         textTheme: GoogleFonts.plusJakartaSansTextTheme(Theme.of(context).textTheme),
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFF1C2632),
+        backgroundColor: Colors.white,
         body: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(vertical: 40),
             child: Container(
-              width: 360,
+              width: MediaQuery.sizeOf(context).width,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(40),
@@ -308,74 +328,32 @@ class _Frame7State extends State<Frame7> {
                     _buildPasswordField(),
                     const SizedBox(height: 24),
 
-                    // Certificate upload
-                    Text(
-                      'Medical Certificate',
-                      style: GoogleFonts.plusJakartaSans(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF1A1919)),
-                    ),
-                    const SizedBox(height: 8),
-                    GestureDetector(
-                      onTap: _pickCertificate,
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        height: 120,
-                        decoration: BoxDecoration(
-                          color: _certificateBytes != null
-                              ? Colors.transparent
-                              : const Color(0xFFFFF5F5),
-                          border: Border.all(
-                            color: _certificateBytes != null
-                                ? _coral
-                                : const Color(0xFFFFCCCD),
-                            width: _certificateBytes != null ? 1.5 : 1.0,
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildUploadCard(
+                            label: 'Medical Certificate',
+                            uploadText: 'Upload Certificate',
+                            bytes: _certificateBytes,
+                            onPick: _pickCertificate,
+                            onClear: () =>
+                                setState(() => _certificateBytes = null),
+                            icon: Icons.upload_file_outlined,
                           ),
-                          borderRadius: BorderRadius.circular(16),
                         ),
-                        child: _certificateBytes != null
-                            ? ClipRRect(
-                                borderRadius: BorderRadius.circular(15),
-                                child: Stack(
-                                  fit: StackFit.expand,
-                                  children: [
-                                    Image.memory(_certificateBytes!, fit: BoxFit.cover),
-                                    Positioned(
-                                      top: 8, right: 8,
-                                      child: GestureDetector(
-                                        onTap: () => setState(() => _certificateBytes = null),
-                                        child: Container(
-                                          padding: const EdgeInsets.all(4),
-                                          decoration: const BoxDecoration(
-                                              color: Colors.white,
-                                              shape: BoxShape.circle),
-                                          child: const Icon(Icons.close,
-                                              size: 16, color: _coral),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.upload_file_outlined,
-                                      color: _coral, size: 32),
-                                  const SizedBox(height: 8),
-                                  Text('Upload Certificate',
-                                      style: GoogleFonts.plusJakartaSans(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w600,
-                                          color: _coral)),
-                                  Text('Tap to select from gallery',
-                                      style: GoogleFonts.plusJakartaSans(
-                                          fontSize: 11,
-                                          color: const Color(0xFFB0B0B0))),
-                                ],
-                              ),
-                      ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: _buildUploadCard(
+                            label: 'Doctor Photo',
+                            uploadText: 'Upload Photo',
+                            bytes: _doctorPhotoBytes,
+                            onPick: _pickDoctorPhoto,
+                            onClear: () =>
+                                setState(() => _doctorPhotoBytes = null),
+                            icon: Icons.person_add_alt_1_outlined,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 24),
 
@@ -496,6 +474,89 @@ class _Frame7State extends State<Frame7> {
         Expanded(child: _genderOption('MALE', 'Male')),
         const SizedBox(width: 8),
         Expanded(child: _genderOption('FEMALE', 'Female')),
+      ],
+    );
+  }
+
+  Widget _buildUploadCard({
+    required String label,
+    required String uploadText,
+    required Uint8List? bytes,
+    required VoidCallback onPick,
+    required VoidCallback onClear,
+    required IconData icon,
+  }) {
+    final hasImage = bytes != null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.plusJakartaSans(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: const Color(0xFF1A1919)),
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: onPick,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            height: 120,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: hasImage ? Colors.transparent : const Color(0xFFFFF5F5),
+              border: Border.all(
+                color: hasImage ? _coral : const Color(0xFFFFCCCD),
+                width: hasImage ? 1.5 : 1.0,
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: hasImage
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.memory(bytes!, fit: BoxFit.cover),
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: GestureDetector(
+                            onTap: onClear,
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle),
+                              child: const Icon(Icons.close,
+                                  size: 16, color: _coral),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(icon, color: _coral, size: 30),
+                      const SizedBox(height: 8),
+                      Text(uploadText,
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: _coral)),
+                      Text('Tap to select',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.plusJakartaSans(
+                              fontSize: 10,
+                              color: const Color(0xFFB0B0B0))),
+                    ],
+                  ),
+          ),
+        ),
       ],
     );
   }

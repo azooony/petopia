@@ -30,7 +30,13 @@ export class AuthController {
     next: NextFunction
   ) => {
     try {
-      if (!req.file) {
+      const files = req.files as
+        | Record<string, Express.Multer.File[]>
+        | undefined;
+      const certificateFile = files?.["certificate"]?.[0];
+      const photoFile = files?.["photo"]?.[0];
+
+      if (!certificateFile) {
         res.status(400).json({
           success: false,
           message: "Certificate image is required",
@@ -38,8 +44,20 @@ export class AuthController {
         });
         return;
       }
+      if (!photoFile) {
+        res.status(400).json({
+          success: false,
+          message: "Doctor photo is required",
+          error: "Doctor photo is required",
+        });
+        return;
+      }
 
-      const result = await AuthService.registerVet(req.body, req.file);
+      const result = await AuthService.registerVet(
+        req.body,
+        certificateFile,
+        photoFile
+      );
 
       res.status(201).json({
         success: true,

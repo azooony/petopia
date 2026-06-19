@@ -86,11 +86,11 @@ class _DoctorSignInState extends State<DoctorSignIn> {
             GoogleFonts.plusJakartaSansTextTheme(Theme.of(context).textTheme),
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFF1C2632),
+        backgroundColor: Colors.white,
         body: Center(
           child: Container(
-            width: 360,
-            height: 800,
+            width: double.infinity,
+            height: double.infinity,
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(40),

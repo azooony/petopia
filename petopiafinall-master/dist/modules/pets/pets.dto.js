@@ -9,6 +9,8 @@ exports.CreatePetSchema = zod_1.z.object({
     breed: zod_1.z.string().max(100).optional().nullable(),
     gender: zod_1.z.enum([prisma_1.Gender.MALE, prisma_1.Gender.FEMALE]).optional().nullable(),
     description: zod_1.z.string().max(1000).optional().nullable(),
+    photo: zod_1.z.string().optional().nullable(),
+    petType: zod_1.z.enum([prisma_1.PetType.DOG, prisma_1.PetType.CAT]).optional(),
 });
 exports.UpdatePetSchema = exports.CreatePetSchema.partial();
 //# sourceMappingURL=pets.dto.js.map

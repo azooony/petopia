@@ -97,170 +97,162 @@ class _Frame6State extends State<Frame6> {
             Theme.of(context).textTheme),
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFF1C2632),
-        body: Center(
-          child: Container(
-            width: 360,
-            height: 800,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(40),
-            ),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 24, top: 48),
-                    child: Text.rich(
-                      TextSpan(
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                          height: 1.2,
-                        ),
-                        children: const [
-                          TextSpan(text: 'Hello,\n'),
-                          TextSpan(text: 'Welcome Back!'),
-                        ],
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 24, top: 48),
+                  child: Text.rich(
+                    TextSpan(
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                        height: 1.2,
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 48),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: _buildInputField(
-                      controller: _emailController,
-                      focusNode: _emailFocus,
-                      hintText: 'Email',
-                      errorText: 'Please enter a valid email',
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: _buildPasswordField(
-                      controller: _passwordController,
-                      focusNode: _passwordFocus,
-                      hintText: 'Password',
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-
-                  Row(
-                    children: [
-                      const Expanded(
-                        child: Divider(
-                          color: Color(0xFFFF7578),
-                          thickness: 1,
-                          indent: 24,
-                          endIndent: 16,
-                        ),
-                      ),
-                      Text('or',
-                          style: GoogleFonts.plusJakartaSans(
-                              color: const Color(0xFFFF7578), fontSize: 12)),
-                      const Expanded(
-                        child: Divider(
-                          color: Color(0xFFFF7578),
-                          thickness: 1,
-                          indent: 16,
-                          endIndent: 24,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 32),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildSocialButton('assets/images/g.png', 'Google',
-                            () => _handleSocialLogin('Google')),
-                        _buildSocialButton('assets/images/f.png', 'Facebook',
-                            () => _handleSocialLogin('Facebook')),
+                      children: const [
+                        TextSpan(text: 'Hello,\n'),
+                        TextSpan(text: 'Welcome Back!'),
                       ],
                     ),
                   ),
+                ),
+                const SizedBox(height: 48),
 
-                  const Spacer(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: _buildInputField(
+                    controller: _emailController,
+                    focusNode: _emailFocus,
+                    hintText: 'Email',
+                    errorText: 'Please enter a valid email',
+                    keyboardType: TextInputType.emailAddress,
+                  ),
+                ),
+                const SizedBox(height: 16),
 
-                  Center(
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(8),
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const PetOwnerRegister()),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          child: Text.rich(
-                            TextSpan(
-                              text: "Don't have an account? ",
-                              style: GoogleFonts.plusJakartaSans(
-                                  color: const Color(0xFF1A1919),
-                                  fontSize: 12),
-                              children: [
-                                TextSpan(
-                                  text: 'Create Account',
-                                  style: GoogleFonts.plusJakartaSans(
-                                      color: const Color(0xFFFF7578),
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              ],
-                            ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: _buildPasswordField(
+                    controller: _passwordController,
+                    focusNode: _passwordFocus,
+                    hintText: 'Password',
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Divider(
+                        color: Color(0xFFFF7578),
+                        thickness: 1,
+                        indent: 24,
+                        endIndent: 16,
+                      ),
+                    ),
+                    Text('or',
+                        style: GoogleFonts.plusJakartaSans(
+                            color: const Color(0xFFFF7578), fontSize: 12)),
+                    const Expanded(
+                      child: Divider(
+                        color: Color(0xFFFF7578),
+                        thickness: 1,
+                        indent: 16,
+                        endIndent: 24,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 32),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildSocialButton('assets/images/g.png', 'Google',
+                          () => _handleSocialLogin('Google')),
+                      _buildSocialButton('assets/images/f.png', 'Facebook',
+                          () => _handleSocialLogin('Facebook')),
+                    ],
+                  ),
+                ),
+
+                const Spacer(),
+
+                Center(
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const PetOwnerRegister()),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        child: Text.rich(
+                          TextSpan(
+                            text: "Don't have an account? ",
+                            style: GoogleFonts.plusJakartaSans(
+                                color: const Color(0xFF1A1919),
+                                fontSize: 12),
+                            children: [
+                              TextSpan(
+                                text: 'Create Account',
+                                style: GoogleFonts.plusJakartaSans(
+                                    color: const Color(0xFFFF7578),
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                ),
+                const SizedBox(height: 16),
 
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Material(
-                      color:
-                          _isLoading ? Colors.grey[400] : const Color(0xFFFF7578),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Material(
+                    color:
+                        _isLoading ? Colors.grey[400] : const Color(0xFFFF7578),
+                    borderRadius: BorderRadius.circular(28),
+                    child: InkWell(
                       borderRadius: BorderRadius.circular(28),
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(28),
-                        onTap: _isLoading ? null : _handleLogin,
-                        child: Container(
-                          width: double.infinity,
-                          height: 56,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(28)),
-                          child: Center(
-                            child: _isLoading
-                                ? const SizedBox(
-                                    width: 22,
-                                    height: 22,
-                                    child: CircularProgressIndicator(
-                                        color: Colors.white, strokeWidth: 2))
-                                : Text('Get Started',
-                                    style: GoogleFonts.plusJakartaSans(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600)),
-                          ),
+                      onTap: _isLoading ? null : _handleLogin,
+                      child: Container(
+                        width: double.infinity,
+                        height: 56,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(28)),
+                        child: Center(
+                          child: _isLoading
+                              ? const SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                      color: Colors.white, strokeWidth: 2))
+                              : Text('Get Started',
+                                  style: GoogleFonts.plusJakartaSans(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600)),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                ],
-              ),
+                ),
+                const SizedBox(height: 12),
+              ],
             ),
           ),
         ),

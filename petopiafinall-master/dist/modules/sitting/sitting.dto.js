@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SearchSittersSchema = exports.CreateSitterReviewSchema = exports.CreateSittingBookingSchema = exports.DeleteAvailabilitySchema = exports.AddAvailabilitySchema = exports.UploadSitterImageSchema = exports.UpdateSitterProfileSchema = exports.CreateSitterProfileSchema = exports.PaginationSchema = void 0;
+exports.ListPetForSittingSchema = exports.SearchSittersSchema = exports.CreateSitterReviewSchema = exports.CreateSittingBookingSchema = exports.DeleteAvailabilitySchema = exports.AddAvailabilitySchema = exports.UploadSitterImageSchema = exports.UpdateSitterProfileSchema = exports.CreateSitterProfileSchema = exports.PaginationSchema = void 0;
 const zod_1 = require("zod");
 // ─────────────────────────────────────────────
 // Pagination
@@ -81,5 +81,17 @@ exports.SearchSittersSchema = zod_1.z.object({
     page: zod_1.z.coerce.number().min(1).default(1),
     limit: zod_1.z.coerce.number().min(1).max(100).default(10),
     sortBy: zod_1.z.enum(["rating", "newest", "booked"]).optional().default("rating"),
+});
+// ─────────────────────────────────────────────
+// Pet Listing for Sitting
+// ─────────────────────────────────────────────
+exports.ListPetForSittingSchema = zod_1.z.object({
+    petName: zod_1.z.string().min(1),
+    breed: zod_1.z.string().optional().nullable(),
+    age: zod_1.z.coerce.number().int().min(0).max(100),
+    gender: zod_1.z.enum(["MALE", "FEMALE"]).optional().nullable(),
+    petType: zod_1.z.enum(["DOG", "CAT"]).default("DOG"),
+    payRatePerDay: zod_1.z.coerce.number().min(1).max(1000),
+    sittingNotes: zod_1.z.string().max(500).optional().nullable(),
 });
 //# sourceMappingURL=sitting.dto.js.map

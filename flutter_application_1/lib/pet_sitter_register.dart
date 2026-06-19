@@ -35,11 +35,14 @@ class _PetSitterRegisterState extends State<PetSitterRegister> {
   }
 
   Future<void> _handleSubmit() async {
-    if (_placePhotoBytes == null) {
+    final placePhotoBytes = _placePhotoBytes;
+    final idPhotoBytes = _idPhotoBytes;
+
+    if (placePhotoBytes == null) {
       _showError('Please upload a photo of where the pet will stay.');
       return;
     }
-    if (_idPhotoBytes == null) {
+    if (idPhotoBytes == null) {
       _showError('Please upload a photo of your national ID.');
       return;
     }
@@ -47,9 +50,9 @@ class _PetSitterRegisterState extends State<PetSitterRegister> {
     setState(() => _isLoading = true);
     try {
       await SittingService.registerSitter(
-        nationalIdBytes:     _idPhotoBytes!,
+        nationalIdBytes:     idPhotoBytes,
         nationalIdFilename:  'national_id.jpg',
-        venuePhotoBytes:     _placePhotoBytes!,
+        venuePhotoBytes:     placePhotoBytes,
         venuePhotoFilename:  'venue_photo.jpg',
       );
       if (!mounted) return;
@@ -140,141 +143,120 @@ class _PetSitterRegisterState extends State<PetSitterRegister> {
         textTheme: GoogleFonts.plusJakartaSansTextTheme(Theme.of(context).textTheme),
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFF1C2632),
-        body: Center(
-          child: ListView(
-            children: [
-              Column(
-                children: [
-                  Container(
-                    width: 381.66,
-                    height: 850.32,
-                    decoration: const ShapeDecoration(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(46)),
-                      ),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                  // Back button
-                  GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE8E8E8),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: Color(0xFF1A1919)),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  Text(
-                    'Become a\nPet Sitter',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.black,
-                      height: 1.2,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Upload the required photos for admin approval before you can start accepting pets.',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 12,
-                      color: const Color(0xFF9E9E9E),
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-
-                  // Place photo
-                  Text(
-                    'Photo of where the pet will stay',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF1A1919),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _buildUploadBox(
-                    bytes: _placePhotoBytes,
-                    icon: Icons.home_outlined,
-                    label: 'Upload Place Photo',
-                    hint: 'Tap to select from gallery',
-                    onTap: () => _pickPhoto(isPlace: true),
-                    onRemove: () => setState(() => _placePhotoBytes = null),
-                  ),
-                  const SizedBox(height: 24),
-
-                  // National ID photo
-                  Text(
-                    'National ID photo',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF1A1919),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _buildUploadBox(
-                    bytes: _idPhotoBytes,
-                    icon: Icons.badge_outlined,
-                    label: 'Upload National ID',
-                    hint: 'Tap to select from gallery',
-                    onTap: () => _pickPhoto(isPlace: false),
-                    onRemove: () => setState(() => _idPhotoBytes = null),
-                  ),
-                  const SizedBox(height: 16),
-                              ],
+                        GestureDetector(
+                          onTap: () => Navigator.maybePop(context),
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE8E8E8),
+                              borderRadius: BorderRadius.circular(10),
                             ),
+                            child: const Icon(Icons.arrow_back_ios_new_rounded, size: 16, color: Color(0xFF1A1919)),
                           ),
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          'Become a\nPet Sitter',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 30,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.black,
+                            height: 1.2,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Upload the required photos for admin approval before you can start accepting pets.',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 12,
+                            color: const Color(0xFF9E9E9E),
+                            height: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                        Text(
+                          'Photo of where the pet will stay',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF1A1919),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        _buildUploadBox(
+                          bytes: _placePhotoBytes,
+                          icon: Icons.home_outlined,
+                          label: 'Upload Place Photo',
+                          hint: 'Tap to select from gallery',
+                          onTap: () => _pickPhoto(isPlace: true),
+                          onRemove: () => setState(() => _placePhotoBytes = null),
+                        ),
+                        const SizedBox(height: 24),
+                        Text(
+                          'National ID photo',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF1A1919),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        _buildUploadBox(
+                          bytes: _idPhotoBytes,
+                          icon: Icons.badge_outlined,
+                          label: 'Upload National ID',
+                          hint: 'Tap to select from gallery',
+                          onTap: () => _pickPhoto(isPlace: false),
+                          onRemove: () => setState(() => _idPhotoBytes = null),
                         ),
                         const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          height: 56,
-                          child: ElevatedButton(
-                            onPressed: _isLoading ? null : _handleSubmit,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: _coral,
-                              disabledBackgroundColor: Colors.grey[400],
-                              foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(28)),
-                              elevation: 0,
-                            ),
-                            child: _isLoading
-                                ? const SizedBox(
-                                    width: 22, height: 22,
-                                    child: CircularProgressIndicator(
-                                        color: Colors.white, strokeWidth: 2))
-                                : Text(
-                                    'Submit for Approval',
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                          ),
-                        ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _handleSubmit,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _coral,
+                      disabledBackgroundColor: Colors.grey[400],
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(28)),
+                      elevation: 0,
+                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 22, height: 22,
+                            child: CircularProgressIndicator(
+                                color: Colors.white, strokeWidth: 2))
+                        : Text(
+                            'Submit for Approval',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

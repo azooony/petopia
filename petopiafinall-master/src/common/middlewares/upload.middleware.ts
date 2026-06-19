@@ -17,6 +17,21 @@ function makeStorage(folder: string): StorageEngine {
   });
 }
 
+function makeVetRegistrationStorage(): StorageEngine {
+  return multer.diskStorage({
+    destination: (req: Request, file, cb) => {
+      const folder =
+        file.fieldname === "photo" ? "uploads/vets/" : "uploads/certificates/";
+      fs.mkdirSync(folder, { recursive: true });
+      cb(null, folder);
+    },
+    filename: (req: Request, file, cb) => {
+      const uniqueName = Date.now() + path.extname(file.originalname);
+      cb(null, uniqueName);
+    },
+  });
+}
+
 const imageFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   if (file.mimetype.startsWith("image/")) {
     cb(null, true);
@@ -29,6 +44,12 @@ const limits = { fileSize: 5 * 1024 * 1024 };
 
 export const upload = multer({
   storage: makeStorage("uploads/certificates/"),
+  fileFilter: imageFilter,
+  limits,
+});
+
+export const uploadVetRegistration = multer({
+  storage: makeVetRegistrationStorage(),
   fileFilter: imageFilter,
   limits,
 });

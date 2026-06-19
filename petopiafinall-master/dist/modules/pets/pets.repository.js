@@ -57,6 +57,12 @@ class PetRepository {
             },
         });
     }
+    static updatePetPhoto(petId, photoUrl) {
+        return prisma_1.default.pet.update({
+            where: { id: petId },
+            data: { photo: photoUrl },
+        });
+    }
     static deletePet(petId) {
         return prisma_1.default.pet.delete({
             where: { id: petId },

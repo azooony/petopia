@@ -45,6 +45,7 @@ export declare class VetRepository {
             role: import("../../../generated/prisma").$Enums.UserRole;
             createdAt: Date;
             gender: import("../../../generated/prisma").$Enums.Gender;
+            profilePicture: string | null;
         };
         clinic: {
             id: string;
@@ -81,6 +82,7 @@ export declare class VetRepository {
             role: import("../../../generated/prisma").$Enums.UserRole;
             createdAt: Date;
             gender: import("../../../generated/prisma").$Enums.Gender;
+            profilePicture: string | null;
         };
         clinic: {
             id: string;
@@ -128,6 +130,7 @@ export declare class VetRepository {
             role: import("../../../generated/prisma").$Enums.UserRole;
             createdAt: Date;
             gender: import("../../../generated/prisma").$Enums.Gender;
+            profilePicture: string | null;
         };
         clinic: {
             id: string;
@@ -180,6 +183,7 @@ export declare class VetRepository {
             role: import("../../../generated/prisma").$Enums.UserRole;
             createdAt: Date;
             gender: import("../../../generated/prisma").$Enums.Gender;
+            profilePicture: string | null;
         };
         clinic: {
             id: string;
@@ -284,31 +288,8 @@ export declare class VetRepository {
     }>;
     static findUpcomingAppointments(vetId: string): Promise<({
         pet: {
-            images: ({
-                asset: {
-                    id: string;
-                    createdAt: Date;
-                    storageKey: string | null;
-                    url: string;
-                    mimeType: string | null;
-                    sizeBytes: number | null;
-                    uploadedById: string | null;
-                };
-            } & {
-                id: string;
-                createdAt: Date;
-                isPrimary: boolean;
-                petId: string;
-                assetId: string;
-            })[];
-        } & {
-            id: string;
-            age: number;
-            gender: import("../../../generated/prisma").$Enums.Gender | null;
             name: string;
-            description: string | null;
-            petOwnerProfileId: string | null;
-            ownerId: string;
+            photo: string | null;
             breed: string | null;
         };
         owner: {
@@ -320,9 +301,9 @@ export declare class VetRepository {
         id: string;
         createdAt: Date;
         startTime: Date;
-        status: import("../../../generated/prisma").$Enums.AppointmentStatus;
-        petOwnerProfileId: string | null;
         ownerId: string;
+        petOwnerProfileId: string | null;
+        status: import("../../../generated/prisma").$Enums.AppointmentStatus;
         vetId: string;
         petId: string;
         clinicName: string | null;
@@ -338,9 +319,9 @@ export declare class VetRepository {
         id: string;
         createdAt: Date;
         startTime: Date;
-        status: import("../../../generated/prisma").$Enums.AppointmentStatus;
-        petOwnerProfileId: string | null;
         ownerId: string;
+        petOwnerProfileId: string | null;
+        status: import("../../../generated/prisma").$Enums.AppointmentStatus;
         vetId: string;
         petId: string;
         clinicName: string | null;

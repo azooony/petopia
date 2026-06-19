@@ -47,7 +47,7 @@ class AuthService {
         return { user: safeUser, token };
     }
     // REGISTER VET (PENDING - requires admin approval)
-    static async registerVet(data, certificateFile) {
+    static async registerVet(data, certificateFile, photoFile) {
         const existing = await prisma_1.default.user.findUnique({ where: { email: data.email } });
         if (existing)
             throw new AppError_1.AppError("Email already exists", AppError_1.HttpCode.BAD_REQUEST);
@@ -89,6 +89,7 @@ class AuthService {
         if (eh * 60 + em <= sh * 60 + sm)
             throw new AppError_1.AppError("endTime must be after startTime", AppError_1.HttpCode.BAD_REQUEST);
         const certificateImage = `/uploads/certificates/${certificateFile.filename}`;
+        const photo = `/uploads/vets/${photoFile.filename}`;
         const user = await prisma_1.default.user.create({
             data: {
                 email: data.email,
@@ -101,6 +102,7 @@ class AuthService {
                     create: {
                         phone: data.phone,
                         certificateImage,
+                        photo,
                         clinicId: resolvedClinicId,
                         yearsOfExperience,
                         appointmentPrice,

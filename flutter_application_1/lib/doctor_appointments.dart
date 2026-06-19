@@ -220,11 +220,11 @@ class _DoctorAppointmentsState extends State<DoctorAppointments> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1C2632),
+      backgroundColor: Colors.white,
       body: Center(
         child: Container(
-          width: 381.66,
-          height: 850.32,
+          width: double.infinity,
+            height: double.infinity,
           decoration: ShapeDecoration(
             color: Colors.white,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(46)),

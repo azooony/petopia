@@ -131,12 +131,12 @@ class _PetOwnerRegisterState extends State<PetOwnerRegister> {
             Theme.of(context).textTheme),
       ),
       child: Scaffold(
-        backgroundColor: const Color(0xFF1C2632),
+        backgroundColor: Colors.white,
         body: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(vertical: 40),
             child: Container(
-              width: 360,
+              width: MediaQuery.sizeOf(context).width,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(40),

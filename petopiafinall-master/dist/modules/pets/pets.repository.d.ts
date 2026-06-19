@@ -5,8 +5,9 @@ export declare class PetRepository {
         phone: string;
         address: string | null;
         userId: string;
-    } | null, null, import("../../../generated/prisma/runtime/library").DefaultArgs, {
+    } | null, null, import("../../../generated/prisma/runtime/client").DefaultArgs, {
         log: ("warn" | "error")[];
+        adapter: import("@prisma/adapter-pg").PrismaPg;
     }>;
     static createPet(data: {
         ownerId: string;
@@ -37,14 +38,21 @@ export declare class PetRepository {
     } & {
         id: string;
         age: number;
+        createdAt: Date;
         gender: import("../../../generated/prisma").$Enums.Gender | null;
         name: string;
         description: string | null;
-        petOwnerProfileId: string | null;
+        photo: string | null;
         ownerId: string;
+        petOwnerProfileId: string | null;
         breed: string | null;
-    }, never, import("../../../generated/prisma/runtime/library").DefaultArgs, {
+        petType: import("../../../generated/prisma").$Enums.PetType;
+        isAvailableForSitting: boolean;
+        payRatePerDay: number | null;
+        sittingNotes: string | null;
+    }, never, import("../../../generated/prisma/runtime/client").DefaultArgs, {
         log: ("warn" | "error")[];
+        adapter: import("@prisma/adapter-pg").PrismaPg;
     }>;
     static findPetsByOwner(userId: string, limit?: number, offset?: number): import("../../../generated/prisma").Prisma.PrismaPromise<({
         images: ({
@@ -67,12 +75,18 @@ export declare class PetRepository {
     } & {
         id: string;
         age: number;
+        createdAt: Date;
         gender: import("../../../generated/prisma").$Enums.Gender | null;
         name: string;
         description: string | null;
-        petOwnerProfileId: string | null;
+        photo: string | null;
         ownerId: string;
+        petOwnerProfileId: string | null;
         breed: string | null;
+        petType: import("../../../generated/prisma").$Enums.PetType;
+        isAvailableForSitting: boolean;
+        payRatePerDay: number | null;
+        sittingNotes: string | null;
     })[]>;
     static findPetById(petId: string): import("../../../generated/prisma").Prisma.Prisma__PetClient<({
         images: ({
@@ -95,14 +109,21 @@ export declare class PetRepository {
     } & {
         id: string;
         age: number;
+        createdAt: Date;
         gender: import("../../../generated/prisma").$Enums.Gender | null;
         name: string;
         description: string | null;
-        petOwnerProfileId: string | null;
+        photo: string | null;
         ownerId: string;
+        petOwnerProfileId: string | null;
         breed: string | null;
-    }) | null, null, import("../../../generated/prisma/runtime/library").DefaultArgs, {
+        petType: import("../../../generated/prisma").$Enums.PetType;
+        isAvailableForSitting: boolean;
+        payRatePerDay: number | null;
+        sittingNotes: string | null;
+    }) | null, null, import("../../../generated/prisma/runtime/client").DefaultArgs, {
         log: ("warn" | "error")[];
+        adapter: import("@prisma/adapter-pg").PrismaPg;
     }>;
     static updatePet(petId: string, data: {
         name?: string;
@@ -110,6 +131,7 @@ export declare class PetRepository {
         breed?: string | null;
         gender?: Gender | null;
         description?: string | null;
+        photo?: string | null;
     }): import("../../../generated/prisma").Prisma.Prisma__PetClient<{
         images: ({
             asset: {
@@ -131,26 +153,59 @@ export declare class PetRepository {
     } & {
         id: string;
         age: number;
+        createdAt: Date;
         gender: import("../../../generated/prisma").$Enums.Gender | null;
         name: string;
         description: string | null;
-        petOwnerProfileId: string | null;
+        photo: string | null;
         ownerId: string;
+        petOwnerProfileId: string | null;
         breed: string | null;
-    }, never, import("../../../generated/prisma/runtime/library").DefaultArgs, {
+        petType: import("../../../generated/prisma").$Enums.PetType;
+        isAvailableForSitting: boolean;
+        payRatePerDay: number | null;
+        sittingNotes: string | null;
+    }, never, import("../../../generated/prisma/runtime/client").DefaultArgs, {
         log: ("warn" | "error")[];
+        adapter: import("@prisma/adapter-pg").PrismaPg;
+    }>;
+    static updatePetPhoto(petId: string, photoUrl: string): import("../../../generated/prisma").Prisma.Prisma__PetClient<{
+        id: string;
+        age: number;
+        createdAt: Date;
+        gender: import("../../../generated/prisma").$Enums.Gender | null;
+        name: string;
+        description: string | null;
+        photo: string | null;
+        ownerId: string;
+        petOwnerProfileId: string | null;
+        breed: string | null;
+        petType: import("../../../generated/prisma").$Enums.PetType;
+        isAvailableForSitting: boolean;
+        payRatePerDay: number | null;
+        sittingNotes: string | null;
+    }, never, import("../../../generated/prisma/runtime/client").DefaultArgs, {
+        log: ("warn" | "error")[];
+        adapter: import("@prisma/adapter-pg").PrismaPg;
     }>;
     static deletePet(petId: string): import("../../../generated/prisma").Prisma.Prisma__PetClient<{
         id: string;
         age: number;
+        createdAt: Date;
         gender: import("../../../generated/prisma").$Enums.Gender | null;
         name: string;
         description: string | null;
-        petOwnerProfileId: string | null;
+        photo: string | null;
         ownerId: string;
+        petOwnerProfileId: string | null;
         breed: string | null;
-    }, never, import("../../../generated/prisma/runtime/library").DefaultArgs, {
+        petType: import("../../../generated/prisma").$Enums.PetType;
+        isAvailableForSitting: boolean;
+        payRatePerDay: number | null;
+        sittingNotes: string | null;
+    }, never, import("../../../generated/prisma/runtime/client").DefaultArgs, {
         log: ("warn" | "error")[];
+        adapter: import("@prisma/adapter-pg").PrismaPg;
     }>;
     static upsertPetImage(petId: string, imageUrl: string, storageKey: string): Promise<{
         asset: {

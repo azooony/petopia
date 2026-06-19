@@ -163,7 +163,11 @@ class _FloatingChatBubbleState extends State<FloatingChatBubble>
       height: 60,
       decoration: BoxDecoration(
         color: _coral,
+<<<<<<< Updated upstream
         borderRadius: BorderRadius.circular(16),
+=======
+        borderRadius: BorderRadius.circular(18),
+>>>>>>> Stashed changes
         boxShadow: [
           BoxShadow(
             color: _coral.withValues(alpha: 0.4),

@@ -66,10 +66,10 @@ class _PetSittingState extends State<PetSitting> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFF1C2632),
+      color: Colors.white,
       child: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 375, maxHeight: 812),
+          constraints: const BoxConstraints.expand(),
           decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(color: Colors.grey[300]!),
@@ -165,7 +165,7 @@ class _PetSittingState extends State<PetSitting> {
           const SizedBox(height: 12),
           Text(
             _pets.isEmpty
-                ? 'No pets are available for sitting yet.'
+                ? 'No pets are saved in the system yet.'
                 : 'No pets match your filters.',
             style: GoogleFonts.plusJakartaSans(
                 color: const Color(0xFFB0B0B0), fontSize: 14),

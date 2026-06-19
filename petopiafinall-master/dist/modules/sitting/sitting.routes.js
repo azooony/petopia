@@ -81,5 +81,21 @@ router.get("/admin/pending", auth_middleware_1.protect, (0, auth_middleware_1.re
 router.patch("/admin/:sitterId/approve", auth_middleware_1.protect, (0, auth_middleware_1.restrictTo)(prisma_1.UserRole.ADMIN), sitting_controller_1.SittingController.approveSitter);
 // PATCH /sitting/admin/:sitterId/reject - Reject sitter profile (admin only)
 router.patch("/admin/:sitterId/reject", auth_middleware_1.protect, (0, auth_middleware_1.restrictTo)(prisma_1.UserRole.ADMIN), sitting_controller_1.SittingController.rejectSitter);
+// ─────────────────────────────────────────────────────────────────────────────
+// Pet Listing for Sitting Routes
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /sitting/pet-listing - List own pet for sitting (with optional photo)
+router.post("/pet-listing", auth_middleware_1.protect, imageUpload.single("petPhoto"), sitting_controller_1.SittingController.listPetForSitting);
+// DELETE /sitting/pet-listing - Remove own pet from sitting list
+router.delete("/pet-listing", auth_middleware_1.protect, sitting_controller_1.SittingController.unlistPet);
+// GET /sitting/available-pets - Get all pets available for sitting
+router.get("/available-pets", auth_middleware_1.protect, sitting_controller_1.SittingController.getAvailablePets);
+// GET /sitting/sitter-status - Get current user's sitter verification status
+router.get("/sitter-status", auth_middleware_1.protect, sitting_controller_1.SittingController.getSitterStatus);
+// POST /sitting/register-sitter - Register as sitter (national ID + venue photo)
+router.post("/register-sitter", auth_middleware_1.protect, imageUpload.fields([
+    { name: "nationalIdPhoto", maxCount: 1 },
+    { name: "venuePhoto", maxCount: 1 },
+]), sitting_controller_1.SittingController.registerSitter);
 exports.default = router;
 //# sourceMappingURL=sitting.routes.js.map

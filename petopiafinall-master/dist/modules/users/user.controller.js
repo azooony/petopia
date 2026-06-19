@@ -87,6 +87,40 @@ class UserController {
             next(err);
         }
     };
+    // POST /users/me/avatar - Upload profile picture
+    static uploadAvatar = async (req, res, next) => {
+        try {
+            if (!req.user?.userId)
+                throw new AppError_1.AppError("Unauthorized", 401);
+            if (!req.file)
+                throw new AppError_1.AppError("Image file is required", 400);
+            const avatarUrl = `${req.protocol}://${req.get("host")}/uploads/avatars/${req.file.filename}`;
+            const user = await user_service_1.UserService.uploadAvatar(req.user.userId, avatarUrl);
+            res.json({
+                success: true,
+                message: "Avatar uploaded successfully",
+                data: user,
+            });
+        }
+        catch (err) {
+            next(err);
+        }
+    };
+    // POST /users/:targetUserId/block
+    static blockUser = async (req, res, next) => {
+        try {
+            if (!req.user?.userId)
+                throw new AppError_1.AppError("Unauthorized", 401);
+            const targetUserId = req.params['targetUserId'];
+            if (!targetUserId)
+                return next(new AppError_1.AppError("targetUserId is required.", 400));
+            await user_service_1.UserService.blockUser(req.user.userId, targetUserId);
+            res.json({ success: true, message: "User blocked.", data: null });
+        }
+        catch (err) {
+            next(err);
+        }
+    };
 }
 exports.UserController = UserController;
 //# sourceMappingURL=user.controller.js.map

@@ -11,6 +11,7 @@ export declare class AdminRepository {
         role: import("../../../generated/prisma").$Enums.UserRole;
         createdAt: Date;
         gender: import("../../../generated/prisma").$Enums.Gender;
+        profilePicture: string | null;
     } | null>;
     findPendingVets(): Promise<({
         user: {
@@ -110,6 +111,7 @@ export declare class AdminRepository {
         city: string;
         emergencyContact: string;
         isAvailable: boolean;
+        venuePhotoUrl: string | null;
         ratingAverage: number;
         totalReviews: number;
     })[]>;
@@ -127,6 +129,7 @@ export declare class AdminRepository {
         city: string;
         emergencyContact: string;
         isAvailable: boolean;
+        venuePhotoUrl: string | null;
         ratingAverage: number;
         totalReviews: number;
     } | null>;
@@ -154,11 +157,15 @@ export declare class AdminRepository {
         city: string;
         emergencyContact: string;
         isAvailable: boolean;
+        venuePhotoUrl: string | null;
         ratingAverage: number;
         totalReviews: number;
     }>;
     findPendingAppointmentPayments(): Promise<({
         appointment: ({
+            pet: {
+                name: string;
+            };
             owner: {
                 id: string;
                 email: string;
@@ -173,9 +180,9 @@ export declare class AdminRepository {
             id: string;
             createdAt: Date;
             startTime: Date;
-            status: import("../../../generated/prisma").$Enums.AppointmentStatus;
-            petOwnerProfileId: string | null;
             ownerId: string;
+            petOwnerProfileId: string | null;
+            status: import("../../../generated/prisma").$Enums.AppointmentStatus;
             vetId: string;
             petId: string;
             clinicName: string | null;
@@ -196,6 +203,7 @@ export declare class AdminRepository {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        petOwnerProfileId: string | null;
         appointmentId: string | null;
         payerId: string;
         method: import("../../../generated/prisma").$Enums.PaymentMethod;
@@ -203,27 +211,37 @@ export declare class AdminRepository {
         amount: number;
         currency: string;
         proofAssetId: string | null;
-        petOwnerProfileId: string | null;
     })[]>;
     findPaymentById(id: string): Promise<({
-        appointment: {
+        appointment: ({
+            pet: {
+                name: string;
+            };
+            owner: {
+                id: string;
+            };
+            vet: {
+                id: string;
+            };
+        } & {
             id: string;
             createdAt: Date;
             startTime: Date;
-            status: import("../../../generated/prisma").$Enums.AppointmentStatus;
-            petOwnerProfileId: string | null;
             ownerId: string;
+            petOwnerProfileId: string | null;
+            status: import("../../../generated/prisma").$Enums.AppointmentStatus;
             vetId: string;
             petId: string;
             clinicName: string | null;
             clinicAddress: string | null;
             reason: string | null;
             price: number;
-        } | null;
+        }) | null;
     } & {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        petOwnerProfileId: string | null;
         appointmentId: string | null;
         payerId: string;
         method: import("../../../generated/prisma").$Enums.PaymentMethod;
@@ -231,12 +249,12 @@ export declare class AdminRepository {
         amount: number;
         currency: string;
         proofAssetId: string | null;
-        petOwnerProfileId: string | null;
     }) | null>;
     approveAppointmentPayment(paymentId: string, appointmentId: string): Promise<[{
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        petOwnerProfileId: string | null;
         appointmentId: string | null;
         payerId: string;
         method: import("../../../generated/prisma").$Enums.PaymentMethod;
@@ -244,14 +262,13 @@ export declare class AdminRepository {
         amount: number;
         currency: string;
         proofAssetId: string | null;
-        petOwnerProfileId: string | null;
     }, {
         id: string;
         createdAt: Date;
         startTime: Date;
-        status: import("../../../generated/prisma").$Enums.AppointmentStatus;
-        petOwnerProfileId: string | null;
         ownerId: string;
+        petOwnerProfileId: string | null;
+        status: import("../../../generated/prisma").$Enums.AppointmentStatus;
         vetId: string;
         petId: string;
         clinicName: string | null;
@@ -263,6 +280,7 @@ export declare class AdminRepository {
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        petOwnerProfileId: string | null;
         appointmentId: string | null;
         payerId: string;
         method: import("../../../generated/prisma").$Enums.PaymentMethod;
@@ -270,14 +288,13 @@ export declare class AdminRepository {
         amount: number;
         currency: string;
         proofAssetId: string | null;
-        petOwnerProfileId: string | null;
     }, {
         id: string;
         createdAt: Date;
         startTime: Date;
-        status: import("../../../generated/prisma").$Enums.AppointmentStatus;
-        petOwnerProfileId: string | null;
         ownerId: string;
+        petOwnerProfileId: string | null;
+        status: import("../../../generated/prisma").$Enums.AppointmentStatus;
         vetId: string;
         petId: string;
         clinicName: string | null;
